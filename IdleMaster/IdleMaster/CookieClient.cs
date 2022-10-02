@@ -37,7 +37,7 @@ namespace IdleMaster
                     if (cookies["steamLoginSecure"] != null && cookies["steamLoginSecure"].Value == "deleted")
                     {
                         Settings.Default.sessionid = string.Empty;
-                        Settings.Default.steamLogin = string.Empty;
+                        Settings.Default.steamId = string.Empty;
                         Settings.Default.steamLoginSecure = string.Empty;
                         Settings.Default.steamMachineAuth = string.Empty;
                         Settings.Default.steamRememberLogin = string.Empty;

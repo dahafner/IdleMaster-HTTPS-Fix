@@ -48,9 +48,9 @@ namespace IdleMaster
                 txtSessionID.PasswordChar = '\0';
             }
 
-            if (!string.IsNullOrWhiteSpace(Settings.Default.steamLogin))
+            if (!string.IsNullOrWhiteSpace(Settings.Default.steamId))
             {
-                txtsteamMachineAuth.Text = Settings.Default.steamLogin;
+                txtsteamMachineAuth.Text = Settings.Default.steamId;
                 txtsteamMachineAuth.Enabled = false;
             }
             else

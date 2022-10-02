@@ -2,8 +2,11 @@
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using IdleMaster.Properties;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 
 namespace IdleMaster
 {
@@ -30,7 +33,7 @@ namespace IdleMaster
             return tmpTimeList[Settings.Default.LoginTimeout];
         }
 
-        private void frmBrowser_Load(object sender, EventArgs e)
+        private async void frmBrowser_Load(object sender, EventArgs e)
         {
             // Remove any existing session state data
             InternetSetOption(0, 42, null, 0);
@@ -44,22 +47,22 @@ namespace IdleMaster
             InternetSetCookie("https://steamcommunity.com", "steamLoginSecure", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
             InternetSetCookie("https://steamcommunity.com", "steamRememberLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
 
-            // When the form is loaded, navigate to the Steam login page using the web browser control
-            //个人主页（默认）
-            //徽章页面
-            //库存页面（不推荐）
-            //截图页面（不推荐）
-            //评测页面
-            //组页面
+            // When the form is loaded, navigate to the Steam login page using the web browser control            
             string[] PageStr = new string[] { "profile", "badges", "inventory", "screenshots", "recommended", "groups" };
-            wbAuth.Navigate("https://steamcommunity.com/login/home/?goto=my/" + PageStr[Settings.Default.LoginPageRedirect], "_self", null, "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko");
+            await webView21.EnsureCoreWebView2Async();
+            webView21.CoreWebView2.Settings.UserAgent = "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko";
+            webView21.CoreWebView2.Navigate("https://steamcommunity.com/login/home/?goto=my/" + PageStr[Settings.Default.LoginPageRedirect]);            
         }
 
-        // This code block executes each time a new document is loaded into the web browser control
-        private void wbAuth_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private async void webView21_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             // Find the page header, and remove it.  This gives the login form a more streamlined look.
-            dynamic htmldoc = wbAuth.Document.DomDocument;
+            dynamic htmldoc = await webView21.ExecuteScriptAsync("document.documentElement.outerHTML;");
+
+            htmldoc = Regex.Unescape(htmldoc);
+            htmldoc = htmldoc.Remove(0, 1);
+            htmldoc = htmldoc.Remove(htmldoc.Length - 1, 1);
+
             try
             {
                 dynamic globalHeader = htmldoc.GetElementById("global_header");
@@ -73,7 +76,7 @@ namespace IdleMaster
             }
 
             // Get the URL of the page that just finished loading
-            var url = wbAuth.Url.AbsoluteUri;
+            var url = webView21.Source.ToString();
 
             // If the page it just finished loading is the login page
             //if (url == "https://steamcommunity.com/login/home/?goto=my/profile" ||
@@ -82,8 +85,8 @@ namespace IdleMaster
                 url == "https://store.steampowered.com//login/transfer")
             {
                 // Get a list of cookies from the current page
-                CookieContainer container = GetUriCookieContainer(wbAuth.Url);
-                var cookies = container.GetCookies(wbAuth.Url);
+                CookieContainer container = GetUriCookieContainer(webView21.Source);
+                var cookies = container.GetCookies(webView21.Source);
                 foreach (Cookie cookie in cookies)
                 {
                     if (cookie.Name.StartsWith("steamMachineAuth"))
@@ -102,7 +105,7 @@ namespace IdleMaster
                         if (parentalNotice.OuterHtml != "")
                         {
                             // Steam family options enabled
-                            wbAuth.Show();
+                            webView21.Show();
                             Width = 1000;
                             Height = 350;
                             return;
@@ -115,14 +118,14 @@ namespace IdleMaster
                 }
 
                 // Get a list of cookies from the current page
-                var container = GetUriCookieContainer(wbAuth.Url);
-                var cookies = container.GetCookies(wbAuth.Url);
+                var container = GetUriCookieContainer(webView21.Source);
+                var cookies = container.GetCookies(webView21.Source);
 
                 // Go through the cookie data so that we can extract the cookies we are looking for
                 foreach (Cookie cookie in cookies)
                 {
                     // Save the "sessionid" cookie
-                    if (cookie.Name == "sessionid")
+                    if (cookie.Name == "browserid")
                     {
                         Settings.Default.sessionid = cookie.Value;
                     }
@@ -136,10 +139,10 @@ namespace IdleMaster
                     }*/
 
                     // Save the "steamLogin" cookie and construct and save the user's profile link
-                    else if (cookie.Name == "steamLoginSecure")
+                    else if (cookie.Name.StartsWith("steamMachineAuth"))
                     {
                         Settings.Default.steamLoginSecure = cookie.Value;
-                        Settings.Default.myProfileURL = SteamProfile.GetSteamUrl();
+                        Settings.Default.myProfileURL = "https://steamcommunity.com/profiles/" + cookie.Name.Replace("steamMachineAuth", "");
                     }
 
                     else if (cookie.Name == "steamRememberLogin")
@@ -210,11 +213,16 @@ namespace IdleMaster
             return cookies;
         }
 
-        // This code executes each time the web browser control is in the process of navigating
-        private void wbAuth_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+
+        private void webView21_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             // Get the url that's being navigated to
-            var url = e.Url.AbsoluteUri;
+            var url = e.Uri;
+
+            if (url.StartsWith("data:text"))
+            {
+                return;
+            }
 
             // Check to see if the page it's navigating to isn't the Steam login page or related calls
             //if (url != "https://steamcommunity.com/login/home/?goto=my/profile"
@@ -225,7 +233,7 @@ namespace IdleMaster
                 tmrCheck.Enabled = true;
 
                 // If it's navigating to a page other than the Steam login page, hide the browser control and resize the form
-                wbAuth.Visible = false;
+                webView21.Visible = false;
 
                 // Scale the form based on the user's DPI settings
                 var graphics = CreateGraphics();

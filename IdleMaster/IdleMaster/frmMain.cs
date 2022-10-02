@@ -448,8 +448,7 @@ namespace IdleMaster
         public async Task LoadBadgesAsync()
         {
             // Settings.Default.myProfileURL = https://steamcommunity.com/id/USER
-            // Refresh every time so it will be more stable
-            Settings.Default.myProfileURL= SteamProfile.GetSteamUrl();
+            // Refresh every time so it will be more stable            
             var profileLink = Settings.Default.myProfileURL + "/badges";
             var pages = new List<string>() { "?p=1" };
             var document = new HtmlDocument();
@@ -550,7 +549,13 @@ namespace IdleMaster
         /// <param name="document">HTML document (1 page) from x</param>
         private void ProcessBadgesOnPage(HtmlDocument document)
         {
-            foreach (var badge in document.DocumentNode.SelectNodes("//div[@class=\"badge_row is_link\"]"))
+            var badges = document.DocumentNode.SelectNodes("//div[@class=\"badge_row is_link\"]");
+            if (badges == null)
+            {
+                return;
+            }
+
+            foreach (var badge in badges)
             {
                 var appIdNode = badge.SelectSingleNode(".//a[@class=\"badge_row_overlay\"]").Attributes["href"].Value;
                 var appid = Regex.Match(appIdNode, @"gamecards/(\d+)/").Groups[1].Value;
@@ -801,7 +806,7 @@ namespace IdleMaster
         {
             // Clear the settings
             Settings.Default.sessionid = string.Empty;
-            Settings.Default.steamLogin = string.Empty;
+            Settings.Default.steamId = string.Empty;
             Settings.Default.myProfileURL = string.Empty;
             Settings.Default.steamLoginSecure = string.Empty;
             Settings.Default.steamparental = string.Empty;
