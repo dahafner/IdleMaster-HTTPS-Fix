@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdleMaster", "IdleMaster\IdleMaster.csproj", "{D26CAFBB-F684-4E53-BE38-60AAD2531893}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "steam-idle", "..\..\..\IdleMaster-HTTPS-Fix\steam-idle Source\steam-idle\steam-idle.csproj", "{E0E49AFD-1101-4815-A1F1-01F65D4D3306}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "steam-idle", "..\steam-idle Source\steam-idle\steam-idle.csproj", "{E0E49AFD-1101-4815-A1F1-01F65D4D3306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,4 @@
 ﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Steamworks;
 
@@ -14,9 +11,7 @@ namespace steam_idle
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize", ExactSpelling = true, CharSet =
 System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
         private static extern int SetProcessWorkingSetSize(IntPtr process, int minimumWorkingSetSize, int maximumWorkingSetSize);
-
-       
-
+        
         [STAThread]
         static void Main(string[] args)
         {
@@ -37,6 +32,7 @@ System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
                     {
                         return;
                     }
+
                     SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
                     Application.Run();
                     return;

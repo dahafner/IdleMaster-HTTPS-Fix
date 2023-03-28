@@ -1,12 +1,5 @@
 ﻿using Steamworks;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace steam_idle
@@ -34,8 +27,9 @@ namespace steam_idle
             {
                 return;
             }
+
             panel1.Hide();
-            this.Text = "游戏中...";
+            this.Text = appId.ToString();
             picApp.Load("https://cdn.akamai.steamstatic.com/steam/apps/" + appId.ToString() + "/header_292x136.jpg");
         }
     }
