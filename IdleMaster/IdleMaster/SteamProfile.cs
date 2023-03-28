@@ -36,6 +36,7 @@ namespace IdleMaster
                 Console.WriteLine(ex.Message);
                 Logger.Exception(ex, "frmMain -> GetSignedAs, for steamUrl = " + steamUrl);
             }
+
             return localization.strings.signed_in_as + " " + userName;
         }
     }

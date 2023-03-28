@@ -37,7 +37,6 @@ namespace IdleMaster
             NoticeUseCookie.Text = localization.strings.notice_usecookie;
             NoticeFamilyView.Text = localization.strings.notice_familyview;
 
-
             if (!string.IsNullOrWhiteSpace(Settings.Default.sessionid))
             {
                 txtSessionID.Text = Settings.Default.sessionid;

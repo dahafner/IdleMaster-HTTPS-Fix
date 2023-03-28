@@ -44,10 +44,12 @@ namespace IdleMaster
                         Application.Run(new AlwaysIdleList());
                         break;
                 }
+
                 if (LastMode == Mode)
+                {
                     break;
-            }
-            
+                }
+            }            
         }
 
         public static DialogResult ShowInputDialog(ref string input,string Title="Input",IWin32Window owner=null)

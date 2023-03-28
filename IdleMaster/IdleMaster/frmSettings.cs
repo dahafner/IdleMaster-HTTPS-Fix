@@ -28,14 +28,17 @@ namespace IdleMaster
             {
                 Settings.Default.sort = "default";
             }
+            
             if (radIdleLeastDrops.Checked)
             {
                 Settings.Default.sort = "leastcards";
             }
+
             if (radIdleMostDrops.Checked)
             {
                 Settings.Default.sort = "mostcards";
             }
+
             if (radIdleMostValue.Checked)
             {
                 Settings.Default.sort = "mostvalue";
@@ -47,6 +50,7 @@ namespace IdleMaster
                 {
                     MessageBox.Show(localization.strings.please_restart);
                 }
+
                 Settings.Default.language = cboLanguage.Text;
             }
 
@@ -60,25 +64,26 @@ namespace IdleMaster
                 Settings.Default.OnlyOneGameIdle = radOneGameOnly.Checked && !radManyThenOne.Checked;
                 Settings.Default.OneThenMany = false;
             }
+
             Settings.Default.minToTray = chkMinToTray.Checked;
             Settings.Default.ignoreclient = chkIgnoreClientStatus.Checked;
             Settings.Default.showUsername = chkShowUsername.Checked;
             Settings.Default.Save();
             Close();
         }
-        //以下为魔改代码
+                
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string defVal, StringBuilder retVal, int size, string filePath);
         private string MinRuntime_s;
         private void LoadForm()
         {
             try
-            {
-                //获取最小运行时间
+            {                
                 StringBuilder temp = new StringBuilder(500);
                 GetPrivateProfileString("AutoNext", "MinRuntime", "2", temp, 500, ".\\Settings.ini");
                 if (temp.ToString() == "")
-                { MinRuntime_s = "2"; }
+                { 
+                    MinRuntime_s = "2"; }
                 else
                 {
                     MinRuntime_s = temp.ToString();
@@ -87,7 +92,7 @@ namespace IdleMaster
             catch (Exception ex)
             {
                 MessageBox.Show("程序发生错误，即将退出！\r\n错误信息：" + ex.Message);
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
         }
     

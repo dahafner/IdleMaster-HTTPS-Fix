@@ -31,7 +31,6 @@ namespace IdleMaster
             // Remove any existing session state data
             InternetSetOption(0, 42, null, 0);
 
-
             // Localize form
             this.Text = localization.strings.please_login;
             lblSaving.Text = localization.strings.saving_info;
@@ -116,8 +115,6 @@ namespace IdleMaster
                 // Go through the cookie data so that we can extract the cookies we are looking for
                 foreach (var cookie in cookies)
                 {
-
-
                     // Save the "sessionid" cookie
                     if (cookie.Name == "sessionid")
                     {
@@ -210,7 +207,6 @@ namespace IdleMaster
             return cookies;
         }
 
-
         private void webView21_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             // Get the url that's being navigated to
@@ -224,7 +220,9 @@ namespace IdleMaster
             // Check to see if the page it's navigating to isn't the Steam login page or related calls
             //if (url != "https://steamcommunity.com/login/home/?goto=my/profile"
             if (!url.StartsWith("https://steamcommunity.com/login/home/?goto=my/")
-                      && url != "https://store.steampowered.com/login/transfer" && url != "https://store.steampowered.com//login/transfer" && url.StartsWith("javascript:") == false && url.StartsWith("about:") == false)
+                      && url != "https://store.steampowered.com/login/transfer" 
+                      && url != "https://store.steampowered.com//login/transfer" 
+                      && url.StartsWith("javascript:") == false && url.StartsWith("about:") == false)
             {
                 // start the sanity check timer
                 tmrCheck.Enabled = true;
@@ -246,12 +244,11 @@ namespace IdleMaster
             // Prevents the application from "saving" for more than 30 seconds and will attempt to save the cookie data after that time
             if (secondsWaiting > 0)
             {
-                secondsWaiting = secondsWaiting - 1;
+                secondsWaiting--;
             }
             else
             {
                 tmrCheck.Enabled = false;
-                //MessageBox.Show("等待超时，退出");
                 Close();
             }
         }

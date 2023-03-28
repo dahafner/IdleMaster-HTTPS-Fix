@@ -63,6 +63,7 @@ namespace IdleMaster
                 {
                     return;
                 }
+
                 using (Stream output = File.OpenWrite(file))
                 {
                     resource.CopyTo(output);
@@ -92,15 +93,19 @@ namespace IdleMaster
                         {
                             var badge = AllBadges.SingleOrDefault(b => b.AppId == price.AppId);
                             if (badge != null)
+                            {
                                 badge.AveragePrice = price.Avg_Price;
+                            }
                         }
+
                         AllBadges = AllBadges.OrderByDescending(b => b.AveragePrice).ToList();
                     }
                     catch  
                     {
-
-                    }                    
+                    }        
+                    
                     break;
+
                 default:
                     return;
             }
@@ -188,8 +193,7 @@ namespace IdleMaster
                                 process.Kill();
                             }
                         }
-                    }
-                    
+                    }                    
                 }
             }
             catch (Exception)
@@ -209,6 +213,7 @@ namespace IdleMaster
                 {
                     return;
                 }
+
                 if (CanIdleBadges.Any())
                 {
                     statistics.setRemainingCards((uint)CardsRemaining);
@@ -248,8 +253,6 @@ namespace IdleMaster
                                 StartSoloIdle(CanIdleBadges.First());
                             }
                         }
-                        
-                        
                     }
                 }
                 else
@@ -268,13 +271,13 @@ namespace IdleMaster
             {
                 IsAutoNextOn = false;
                 IsAutoNextPaused = true;
-                autonextlabel.Text = "暂停切换";
+                autonextlabel.Text = "Pause";
             }
             else if (!IsAutoNextOn && !b && IsAutoNextPaused)
             {
                 tmrAutoNext.Enabled = true;
                 IsAutoNextPaused = false;
-                autonextlabel.Text = "关闭自动下一个";
+                autonextlabel.Text = "Weiter";
             }
         }
 
@@ -472,8 +475,10 @@ namespace IdleMaster
                         ResetClientStatus();
                         return;
                     }
+
                     throw new Exception("");
                 }
+
                 document.LoadHtml(response);
 
                 // If user is authenticated, check page count. If user is not authenticated, pages are different.
@@ -724,6 +729,7 @@ namespace IdleMaster
                         language_string = "en";
                         break;
                 }
+
                 Thread.CurrentThread.CurrentUICulture = new CultureInfo(language_string);                
             }            
 
@@ -920,7 +926,6 @@ namespace IdleMaster
             if (IsAutoNextOn == true)
             { autonextthr(); }
         }
-
 
         private async void tmrCardDropCheck_Tick(object sender, EventArgs e)
         {
@@ -1197,6 +1202,7 @@ namespace IdleMaster
                 tmrAutoNext.Enabled = false;
                 return;
             }
+
             if (CardsRemaining == 0)
             {
                 tmrAutoNext.Enabled = false;
@@ -1210,6 +1216,7 @@ namespace IdleMaster
                     IsAutoNextOn = false;
                     MessageBox.Show("已完成挂卡！");
                 }
+
                 return;
             }
             else

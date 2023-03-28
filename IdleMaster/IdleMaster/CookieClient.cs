@@ -113,7 +113,7 @@ namespace IdleMaster
                 if (!string.IsNullOrWhiteSpace(content) || count == 0)
                     return content;
 
-                count = count - 1;
+                count--;
             }
         }
 
