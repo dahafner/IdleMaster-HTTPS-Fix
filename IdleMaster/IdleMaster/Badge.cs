@@ -26,7 +26,6 @@ namespace IdleMaster
 
         public double HoursPlayed { get; set; }
 
-
         private Process idleProcess;
 
         public bool InIdle { get { return idleProcess != null && !idleProcess.HasExited; } }
@@ -34,7 +33,9 @@ namespace IdleMaster
         public Process Idle()
         {
             if (InIdle)
+            {
                 return idleProcess;
+            }
 
             idleProcess = Process.Start(new ProcessStartInfo("steam-idle.exe", AppId.ToString()) { WindowStyle = ProcessWindowStyle.Hidden });
             return idleProcess;
@@ -43,7 +44,9 @@ namespace IdleMaster
         public void StopIdle()
         {
             if (InIdle)
+            {
                 idleProcess.Kill();
+            }
         }
 
         public async Task<bool> CanCardDrops()
@@ -57,6 +60,7 @@ namespace IdleMaster
                 {
                     return false;
                 }
+
                 document.LoadHtml(response);
 
                 var hoursNode = document.DocumentNode.SelectSingleNode("//div[@class=\"badge_title_stats_playtime\"]");
@@ -72,6 +76,7 @@ namespace IdleMaster
             {
                 Logger.Exception(ex, "Badge -> CanCardDrops, for id = " + AppId);
             }
+
             return false;
         }
 

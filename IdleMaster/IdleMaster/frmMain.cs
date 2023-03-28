@@ -198,7 +198,6 @@ namespace IdleMaster
             }
             catch (Exception)
             {
-
             }
 
             // Check if user is authenticated and if any badge left to idle
