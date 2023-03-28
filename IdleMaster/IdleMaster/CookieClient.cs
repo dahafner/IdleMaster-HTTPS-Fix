@@ -51,8 +51,8 @@ namespace IdleMaster
             }
             catch (Exception)
             {
-
             }
+
             return null;
         }
 
@@ -80,7 +80,7 @@ namespace IdleMaster
 
         public static async Task<string> GetHttpAsync(string url, int count = 3,bool IgnoreCookieState=false)
         {
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             while (true)
             {
                 var client = new CookieClient();
@@ -92,14 +92,15 @@ namespace IdleMaster
                     {
                         return string.Empty;
                     }
-                    System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+
+                    ServicePointManager.ServerCertificateValidationCallback +=
                     delegate (object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
                              System.Security.Cryptography.X509Certificates.X509Chain chain,
                              System.Net.Security.SslPolicyErrors sslPolicyErrors)
                     {
                         return true; // **** Always accept  
                     };
-                    System.Net.ServicePointManager.Expect100Continue = false;
+                    ServicePointManager.Expect100Continue = false;
                     url=url.Replace("http://", "https://");
                     content = await client.DownloadStringTaskAsync(url);
                     

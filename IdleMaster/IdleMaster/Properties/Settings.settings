@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="sessionid" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">u</Value>
     </Setting>
     <Setting Name="steamId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -12,7 +12,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="steamLoginSecure" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">u</Value>
     </Setting>
     <Setting Name="sort" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -49,15 +49,6 @@
     </Setting>
     <Setting Name="OneThenMany" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="LoginTimeout" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1</Value>
-    </Setting>
-    <Setting Name="LoginPageRedirect" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="MaxIdleCount" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="IdleSpecified" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

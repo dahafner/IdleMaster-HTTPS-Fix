@@ -112,16 +112,22 @@ namespace IdleMaster
             foreach (var badge in CanIdleBadges.Where(b => !Equals(b, CurrentBadge)))
             {
                 if (badge.HoursPlayed >= MinRuntime && badge.InIdle)
+                {
                     badge.StopIdle();
+                }
 
-                if (badge.HoursPlayed < MinRuntime && CanIdleBadges.Count(b => b.InIdle) < Settings.Default.MaxIdleCount)
+                if (badge.HoursPlayed < MinRuntime && CanIdleBadges.Count(b => b.InIdle) < 30)
+                {
                     badge.Idle();
+                }
             }
 
             RefreshGamesStateListView();
 
             if (!CanIdleBadges.Any(b => b.InIdle))
+            {
                 NextIdle();
+            }
 
             UpdateStateInfo();
         }
@@ -293,7 +299,7 @@ namespace IdleMaster
             {
                 try
                 {
-                    picApp.Load("https://cdn.akamai.steamstatic.com/steam/apps/" + CurrentBadge.StringId + "/header_292x136.jpg");
+                    picApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + CurrentBadge.StringId + "/header_292x136.jpg");
                     picApp.Visible = true;
                 }
                 catch (Exception ex)
@@ -441,9 +447,7 @@ namespace IdleMaster
             var graphics = CreateGraphics();
             var scale = graphics.DpiY * 1.9583;
             Height = Convert.ToInt32(scale);
-
         }
-
 
         public async Task LoadBadgesAsync()
         {
@@ -457,8 +461,8 @@ namespace IdleMaster
             try
             {
                 // Load Page 1 and check how many pages there are
-                var pageURL = string.Format("{0}/?p={1}", profileLink, 1);
-                var response = await CookieClient.GetHttpAsync(pageURL);
+                //var pageURL = string.Format("{0}/?p={1}", profileLink, 1);
+                var response = await CookieClient.GetHttpAsync(profileLink);
                 // Response should be empty. User should be unauthorised.
                 if (string.IsNullOrEmpty(response))
                 {
@@ -487,29 +491,29 @@ namespace IdleMaster
                 ProcessBadgesOnPage(document);
 
                 // Load other pages
-                for (var i = 2; i <= pagesCount; i++)
-                {
-                    lblDrops.Text = string.Format(localization.strings.reading_badge_page + " {0}/{1}, " + localization.strings.please_wait, i, pagesCount);
+                //for (var i = 2; i <= pagesCount; i++)
+                //{
+                //    lblDrops.Text = string.Format(localization.strings.reading_badge_page + " {0}/{1}, " + localization.strings.please_wait, i, pagesCount);
 
-                    // Load Page 2+
-                    pageURL = string.Format("{0}/?p={1}", profileLink, i);
-                    response = await CookieClient.GetHttpAsync(pageURL);
-                    // Response should be empty. User should be unauthorised.
-                    if (string.IsNullOrEmpty(response))
-                    {
-                        RetryCount++;
-                        if (RetryCount == 18)
-                        {
-                            ResetClientStatus();
-                            return;
-                        }
-                        throw new Exception("");
-                    }
-                    document.LoadHtml(response);
+                //    // Load Page 2+
+                //    pageURL = string.Format("{0}/?p={1}", profileLink, i);
+                //    response = await CookieClient.GetHttpAsync(pageURL);
+                //    // Response should be empty. User should be unauthorised.
+                //    if (string.IsNullOrEmpty(response))
+                //    {
+                //        RetryCount++;
+                //        if (RetryCount == 18)
+                //        {
+                //            ResetClientStatus();
+                //            return;
+                //        }
+                //        throw new Exception("");
+                //    }
+                //    document.LoadHtml(response);
 
-                    // Get all badges from current page
-                    ProcessBadgesOnPage(document);
-                }
+                //    // Get all badges from current page
+                //    ProcessBadgesOnPage(document);
+                //}
             }
             catch (Exception ex)
             {
@@ -942,7 +946,7 @@ namespace IdleMaster
 
                 // Check if user is authenticated and if any badge left to idle
                 // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
-                tmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && IsSteamReady && CanIdleBadges.Any() && TimeLeft != 0;
+                tmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && IsSteamReady && CanIdleBadges.Any() && TimeLeft != 0;                
             }
             else
             {

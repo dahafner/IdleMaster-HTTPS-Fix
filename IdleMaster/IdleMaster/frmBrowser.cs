@@ -12,14 +12,13 @@ namespace IdleMaster
 {
     public partial class frmBrowser : Form
     {
-
-        public int SecondsWaiting = GetMaxTimeout();
-
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InternetSetOption(int hInternet, int dwOption, string lpBuffer, int dwBufferLength);
 
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InternetSetCookie(string lpszUrlName, string lpszCookieName, string lpszCookieData);
+
+        private int secondsWaiting = 30;
 
         public frmBrowser()
         {
@@ -27,31 +26,22 @@ namespace IdleMaster
             InitializeComponent();
         }
 
-        public static int GetMaxTimeout()
-        {
-            int[] tmpTimeList = { 15, 30, 60, 90, 125800 };
-            return tmpTimeList[Settings.Default.LoginTimeout];
-        }
-
         private async void frmBrowser_Load(object sender, EventArgs e)
         {
             // Remove any existing session state data
             InternetSetOption(0, 42, null, 0);
 
+
             // Localize form
             this.Text = localization.strings.please_login;
             lblSaving.Text = localization.strings.saving_info;
 
-            // Delete Steam cookie data from the browser control
-            InternetSetCookie("https://steamcommunity.com", "sessionid", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-            InternetSetCookie("https://steamcommunity.com", "steamLoginSecure", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-            InternetSetCookie("https://steamcommunity.com", "steamRememberLogin", ";expires=Mon, 01 Jan 0001 00:00:00 GMT");
-
             // When the form is loaded, navigate to the Steam login page using the web browser control            
-            string[] PageStr = new string[] { "profile", "badges", "inventory", "screenshots", "recommended", "groups" };
+
             await webView21.EnsureCoreWebView2Async();
             webView21.CoreWebView2.Settings.UserAgent = "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko";
-            webView21.CoreWebView2.Navigate("https://steamcommunity.com/login/home/?goto=my/" + PageStr[Settings.Default.LoginPageRedirect]);            
+            // webView21.CoreWebView2.CookieManager.DeleteAllCookies();
+            webView21.CoreWebView2.Navigate("https://steamcommunity.com/login/home/?goto=my/badges");
         }
 
         private async void webView21_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
@@ -119,13 +109,17 @@ namespace IdleMaster
 
                 // Get a list of cookies from the current page
                 var container = GetUriCookieContainer(webView21.Source);
-                var cookies = container.GetCookies(webView21.Source);
+                var cookies2 = container.GetCookies(webView21.Source);
+
+                var cookies = await webView21.CoreWebView2.CookieManager.GetCookiesAsync(url);
 
                 // Go through the cookie data so that we can extract the cookies we are looking for
-                foreach (Cookie cookie in cookies)
+                foreach (var cookie in cookies)
                 {
+
+
                     // Save the "sessionid" cookie
-                    if (cookie.Name == "browserid")
+                    if (cookie.Name == "sessionid")
                     {
                         Settings.Default.sessionid = cookie.Value;
                     }
@@ -139,10 +133,13 @@ namespace IdleMaster
                     }*/
 
                     // Save the "steamLogin" cookie and construct and save the user's profile link
-                    else if (cookie.Name.StartsWith("steamMachineAuth"))
+                    else if (cookie.Name.StartsWith("steamLoginSecure"))
                     {
                         Settings.Default.steamLoginSecure = cookie.Value;
-                        Settings.Default.myProfileURL = "https://steamcommunity.com/profiles/" + cookie.Name.Replace("steamMachineAuth", "");
+                        if (cookies2 != null && cookies2[0] != null)
+                        {
+                            Settings.Default.myProfileURL = "https://steamcommunity.com/profiles/" + cookies2[0].Name.Replace("steamMachineAuth", "");
+                        }
                     }
 
                     else if (cookie.Name == "steamRememberLogin")
@@ -247,9 +244,9 @@ namespace IdleMaster
         private void tmrCheck_Tick(object sender, EventArgs e)
         {
             // Prevents the application from "saving" for more than 30 seconds and will attempt to save the cookie data after that time
-            if (SecondsWaiting > 0)
+            if (secondsWaiting > 0)
             {
-                SecondsWaiting = SecondsWaiting - 1;
+                secondsWaiting = secondsWaiting - 1;
             }
             else
             {
