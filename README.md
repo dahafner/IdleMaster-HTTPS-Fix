@@ -5,9 +5,10 @@
 ## About Idle Master HTTPS Fix  
 This project is the fixed version of the HTTPS Fix version. Because Steam decided to change the cookies and badge pages again, lots of stuff is broken.
 
-## Current status:
+## Current status (28.03.2023)
 - Login with your account works (using WebView2)
-- Reading remaining cards still broken, the badge pages doesn't include anymore the remaining card. Some hefty rewriting is need to get the remaining cards again.
+- Reading remaining cards is working again
+- Idling cards is working
 
 ### About Idle Master  
 The Original Idle Master is developed by [jshackles](https://github.com/jshackles/idle_master)  
