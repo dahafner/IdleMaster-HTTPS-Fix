@@ -38,7 +38,7 @@ namespace IdleMaster
         public int TimeLeft = 900;
         public int RetryCount = 0;
         public int ReloadCount = 0;
-        
+
         public int CardsRemaining { get { return CanIdleBadges.Sum(b => b.RemainingCard); } }
         public int GamesRemaining { get { return CanIdleBadges.Count(); } }
         public Badge CurrentBadge;
@@ -70,7 +70,7 @@ namespace IdleMaster
                 }
             }
         }
-        
+
         public void SortBadges(string method)
         {
             lblDrops.Text = localization.strings.sorting_results;
@@ -82,35 +82,35 @@ namespace IdleMaster
                 case "leastcards":
                     AllBadges = AllBadges.OrderBy(b => b.RemainingCard).ToList();
                     break;
-                case "mostvalue":
-                    try
-                    {
-                        var query = string.Format("http://api.enhancedsteam.com/market_data/average_card_prices/im.php?appids={0}",
-                        string.Join(",", AllBadges.Select(b => b.AppId)));
-                        var json = new WebClient() { Encoding = Encoding.UTF8 }.DownloadString(query);
-                        var convertedJson = JsonConvert.DeserializeObject<EnhancedsteamHelper>(json);
-                        foreach (var price in convertedJson.Avg_Values)
-                        {
-                            var badge = AllBadges.SingleOrDefault(b => b.AppId == price.AppId);
-                            if (badge != null)
-                            {
-                                badge.AveragePrice = price.Avg_Price;
-                            }
-                        }
+                //case "mostvalue":
+                //    try
+                //    {
+                //        var query = string.Format("http://api.enhancedsteam.com/market_data/average_card_prices/im.php?appids={0}",
+                //        string.Join(",", AllBadges.Select(b => b.AppId)));
+                //        var json = new WebClient() { Encoding = Encoding.UTF8 }.DownloadString(query);
+                //        var convertedJson = JsonConvert.DeserializeObject<EnhancedsteamHelper>(json);
+                //        foreach (var price in convertedJson.Avg_Values)
+                //        {
+                //            var badge = AllBadges.SingleOrDefault(b => b.AppId == price.AppId);
+                //            if (badge != null)
+                //            {
+                //                badge.AveragePrice = price.Avg_Price;
+                //            }
+                //        }
 
-                        AllBadges = AllBadges.OrderByDescending(b => b.AveragePrice).ToList();
-                    }
-                    catch  
-                    {
-                    }        
-                    
-                    break;
+                //        AllBadges = AllBadges.OrderByDescending(b => b.AveragePrice).ToList();
+                //    }
+                //    catch
+                //    {
+                //    }
+
+                //    break;
 
                 default:
                     return;
             }
         }
-        //以下是魔改代码
+
         public int MinRuntime = 2;
         public void UpdateIdleProcesses()
         {
@@ -174,7 +174,7 @@ namespace IdleMaster
         {
             // Kill all existing processes before starting any new ones
             // This prevents rogue processes from interfering with idling time and slowing card drops
-            try 
+            try
             {
                 String username = WindowsIdentity.GetCurrent().Name;
                 foreach (var process in Process.GetProcessesByName("steam-idle"))
@@ -193,14 +193,14 @@ namespace IdleMaster
                                 process.Kill();
                             }
                         }
-                    }                    
+                    }
                 }
             }
             catch (Exception)
             {
 
             }
-            
+
             // Check if user is authenticated and if any badge left to idle
             // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
             if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !IsSteamReady)
@@ -230,12 +230,10 @@ namespace IdleMaster
                             var multi = CanIdleBadges.Where(b => b.HoursPlayed >= MinRuntime);
                             if (multi.Count() >= 1)
                             {
-                                PauseAutoNext(false);
                                 StartSoloIdle(multi.First());
                             }
                             else
                             {
-                                PauseAutoNext(true);
                                 StartMultipleIdle();
                             }
                         }
@@ -244,12 +242,10 @@ namespace IdleMaster
                             var multi = CanIdleBadges.Where(b => b.HoursPlayed < MinRuntime);
                             if (multi.Count() >= 2)
                             {
-                                PauseAutoNext(true);
                                 StartMultipleIdle();
                             }
                             else
                             {
-                                PauseAutoNext(false);
                                 StartSoloIdle(CanIdleBadges.First());
                             }
                         }
@@ -261,23 +257,6 @@ namespace IdleMaster
                 }
 
                 UpdateStateInfo();
-            }
-        }
-        //以下为魔改代码
-        private bool IsAutoNextPaused = false;
-        private void PauseAutoNext(bool b)
-        {
-            if (IsAutoNextOn && b && !IsAutoNextPaused)
-            {
-                IsAutoNextOn = false;
-                IsAutoNextPaused = true;
-                autonextlabel.Text = "Pause";
-            }
-            else if (!IsAutoNextOn && !b && IsAutoNextPaused)
-            {
-                tmrAutoNext.Enabled = true;
-                IsAutoNextPaused = false;
-                autonextlabel.Text = "Weiter";
             }
         }
 
@@ -296,25 +275,19 @@ namespace IdleMaster
             GamesState.Visible = false;
             gameToolStripMenuItem.Enabled = true;
 
-            // Update game image
-            //以下是魔改代码
-            if (IsImgEnabled)
+            // Update game image            
+            try
             {
-                try
-                {
-                    picApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + CurrentBadge.StringId + "/header_292x136.jpg");
-                    picApp.Visible = true;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Exception(ex, "frmMain -> StartIdle -> load pic, for id = " + CurrentBadge.AppId);
-                }
+                picApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + CurrentBadge.StringId + "/header_292x136.jpg");
+                picApp.Visible = true;
             }
-            else
+            catch (Exception ex)
             {
+                Logger.Exception(ex, "frmMain -> StartIdle -> load pic, for id = " + CurrentBadge.AppId);
                 picApp.Image = Resources.NoImage;
                 picApp.Visible = true;
             }
+
             // Update label controls
             lblCurrentRemaining.Text = CurrentBadge.RemainingCard + " " + localization.strings.card_drops_remaining;
             lblCurrentStatus.Text = "单线程";
@@ -353,7 +326,7 @@ namespace IdleMaster
 
             // Update label controls
             lblCurrentRemaining.Text = localization.strings.update_games_status;
-            lblCurrentStatus.Text ="多线程";
+            lblCurrentStatus.Text = "多线程";
 
             lblGameName.Visible = false;
             lblHoursPlayed.Visible = false;
@@ -730,8 +703,8 @@ namespace IdleMaster
                         break;
                 }
 
-                Thread.CurrentThread.CurrentUICulture = new CultureInfo(language_string);                
-            }            
+                Thread.CurrentThread.CurrentUICulture = new CultureInfo(language_string);
+            }
 
             // Localize form elements
             fileToolStripMenuItem.Text = localization.strings.file;
@@ -752,7 +725,7 @@ namespace IdleMaster
             lnkResetCookies.Text = "(" + localization.strings.sign_out + ")";
             toolStripStatusLabel1.Text = localization.strings.next_check;
             toolStripStatusLabel1.ToolTipText = localization.strings.next_check;
-            
+
             lblSignedOnAs.Text = localization.strings.signed_in_as;
             GamesState.Columns[0].Text = localization.strings.name;
             GamesState.Columns[1].Text = localization.strings.hours;
@@ -866,40 +839,11 @@ namespace IdleMaster
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StopAutoNext();
             Close();
         }
 
         private async void tmrReadyToGo_Tick(object sender, EventArgs e)
         {
-            //以下是魔改代码
-            try
-            {
-                //获取自动下一个间隔时间
-                StringBuilder temp = new StringBuilder(500);
-                GetPrivateProfileString("AutoNext", "Time", "500", temp, 500, ".\\Settings.ini");
-                if (temp.ToString() == "")
-                { AutoNextTime = 500; }
-                else
-                {
-                    AutoNextTime = Convert.ToInt32(temp.ToString());
-                    tmrAutoNext.Interval = AutoNextTime;
-                }
-                //获取最小运行时间
-                temp = new StringBuilder(500);
-                GetPrivateProfileString("AutoNext", "MinRuntime", "2", temp, 500, ".\\Settings.ini");
-                if (temp.ToString() == "")
-                { MinRuntime = 2; }
-                else
-                {
-                    MinRuntime = Convert.ToInt32(temp.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("程序发生错误，即将退出！\r\n错误信息：" + ex.Message);
-                System.Environment.Exit(0);
-            }
 
             if (!IsCookieReady || !IsSteamReady)
                 return;
@@ -922,9 +866,6 @@ namespace IdleMaster
             await LoadBadgesAsync();
 
             StartIdle();
-            //以下是魔改代码
-            if (IsAutoNextOn == true)
-            { autonextthr(); }
         }
 
         private async void tmrCardDropCheck_Tick(object sender, EventArgs e)
@@ -951,7 +892,7 @@ namespace IdleMaster
 
                 // Check if user is authenticated and if any badge left to idle
                 // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
-                tmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && IsSteamReady && CanIdleBadges.Any() && TimeLeft != 0;                
+                tmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && IsSteamReady && CanIdleBadges.Any() && TimeLeft != 0;
             }
             else
             {
@@ -968,7 +909,7 @@ namespace IdleMaster
         //    AllBadges.RemoveAll(b => Equals(b, CurrentBadge));
         //    StartIdle();
         //}
-        
+
         //以下为魔改代码
         private void btnSkip_Click(object sender, EventArgs e)
         {
@@ -1016,7 +957,6 @@ namespace IdleMaster
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StopAutoNext();
             // Show the form
             String previous = Settings.Default.sort;
             Boolean previous_behavior = Settings.Default.OnlyOneGameIdle;
@@ -1035,12 +975,11 @@ namespace IdleMaster
             {
                 lblSignedOnAs.Text = SteamProfile.GetSignedAs();
                 lblSignedOnAs.Visible = Settings.Default.showUsername;
-            }            
+            }
         }
 
         private void pauseIdlingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StopAutoNext();
             btnPause.PerformClick();
         }
 
@@ -1135,7 +1074,7 @@ namespace IdleMaster
         {
             ReloadCount = ReloadCount + 1;
             lblDrops.Text = localization.strings.badge_didnt_load.Replace("__num__", (10 - ReloadCount).ToString());
-            
+
             if (ReloadCount == 10)
             {
                 tmrBadgeReload.Enabled = false;
@@ -1150,90 +1089,9 @@ namespace IdleMaster
             statistics.checkCardRemaining((uint)CardsRemaining);
         }
 
-        //以下是魔改代码
-        public int AutoNextTime = 500;
-        private bool IsAutoNextOn=false;
-        private bool IsReloaded;
-        private void autoNextToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (IsAutoNextOn == false && IsAutoNextPaused == false)
-            {
-                autonextlabel.Visible = true;
-                autoNextToolStripMenuItem.Text = "关闭自动下一个";
-                IsAutoNextOn = true;
-                IsReloaded = false;
-                autonextthr();
-            }
-            else
-            {
-                StopAutoNext();
-            }
-        }
-        private void StopAutoNext()
-        {
-            autonextlabel.Visible = false;
-            autoNextToolStripMenuItem.Text = "打开自动下一个";
-            autonextlabel.Text = "关闭自动下一个";
-            IsAutoNextOn = false;
-            if (IsAutoNextPaused)
-            {
-                IsAutoNextPaused = false;
-            }
-        }
-        private void ReloadToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            StopAutoNext();
-            ReloadList();
-        }
-        private void autonextthr()
-        {
-            tmrAutoNext.Enabled = true;
-        }
-        private void ReloadList()
-        {
-            StopIdle();
-            AllBadges.Clear();
-            tmrReadyToGo.Enabled = true;
-        }
-        private void tmrAutoNext_Tick(object sender, EventArgs e)
-        {
-            if (IsAutoNextOn == false || IsAutoNextPaused == true)
-            {
-                tmrAutoNext.Enabled = false;
-                return;
-            }
-
-            if (CardsRemaining == 0)
-            {
-                tmrAutoNext.Enabled = false;
-                if (IsReloaded == false)
-                {
-                    IsReloaded = true;
-                    ReloadList();
-                }
-                else
-                {
-                    IsAutoNextOn = false;
-                    MessageBox.Show("已完成挂卡！");
-                }
-
-                return;
-            }
-            else
-            {
-                IsReloaded = false;
-                RunNextIdle();
-            }
-        }
-
-        private void autonextlabel_Click(object sender, EventArgs e)
-        {
-            StopAutoNext();
-        }
-
         private void frmMain_SizeChanged(object sender, EventArgs e)
         {
-            if(Settings.Default.minToTray)
+            if (Settings.Default.minToTray)
             {
                 if (this.WindowState == FormWindowState.Minimized)
                 {
@@ -1243,31 +1101,9 @@ namespace IdleMaster
             }
         }
 
-        public bool IsImgEnabled = false;
-        private void EnableImgToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (IsImgEnabled)
-            {
-                IsImgEnabled = false;
-                EnableImgToolStripMenuItem.Text = "打开图片显示";
-            }
-            else
-            {
-                IsImgEnabled = true;
-                EnableImgToolStripMenuItem.Text = "关闭图片显示";
-            }
-        }
-
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             Process.Start("https://steamcn.com/t367755-1-1");
-        }
-
-        private void toolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            Program.Mode = 1;
-            StopAutoNext();
-            Close();
         }
     }
 }

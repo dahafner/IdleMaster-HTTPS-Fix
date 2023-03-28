@@ -40,7 +40,6 @@ namespace IdleMaster
             this.chkIgnoreClientStatus = new System.Windows.Forms.CheckBox();
             this.chkMinToTray = new System.Windows.Forms.CheckBox();
             this.grpPriority = new System.Windows.Forms.GroupBox();
-            this.radIdleMostValue = new System.Windows.Forms.RadioButton();
             this.radIdleLeastDrops = new System.Windows.Forms.RadioButton();
             this.radIdleMostDrops = new System.Windows.Forms.RadioButton();
             this.radIdleDefault = new System.Windows.Forms.RadioButton();
@@ -160,7 +159,6 @@ namespace IdleMaster
             // 
             this.grpPriority.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpPriority.Controls.Add(this.radIdleMostValue);
             this.grpPriority.Controls.Add(this.radIdleLeastDrops);
             this.grpPriority.Controls.Add(this.radIdleMostDrops);
             this.grpPriority.Controls.Add(this.radIdleDefault);
@@ -168,29 +166,16 @@ namespace IdleMaster
             this.grpPriority.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.grpPriority.Name = "grpPriority";
             this.grpPriority.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.grpPriority.Size = new System.Drawing.Size(392, 92);
+            this.grpPriority.Size = new System.Drawing.Size(392, 79);
             this.grpPriority.TabIndex = 1;
             this.grpPriority.TabStop = false;
             this.grpPriority.Text = "Idling Order";
-            // 
-            // radIdleMostValue
-            // 
-            this.radIdleMostValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.radIdleMostValue.Location = new System.Drawing.Point(7, 35);
-            this.radIdleMostValue.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.radIdleMostValue.Name = "radIdleMostValue";
-            this.radIdleMostValue.Size = new System.Drawing.Size(379, 17);
-            this.radIdleMostValue.TabIndex = 3;
-            this.radIdleMostValue.TabStop = true;
-            this.radIdleMostValue.Text = "Prioritize games with the highest card values";
-            this.radIdleMostValue.UseVisualStyleBackColor = true;
             // 
             // radIdleLeastDrops
             // 
             this.radIdleLeastDrops.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.radIdleLeastDrops.Location = new System.Drawing.Point(7, 69);
+            this.radIdleLeastDrops.Location = new System.Drawing.Point(7, 52);
             this.radIdleLeastDrops.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radIdleLeastDrops.Name = "radIdleLeastDrops";
             this.radIdleLeastDrops.Size = new System.Drawing.Size(379, 17);
@@ -202,7 +187,7 @@ namespace IdleMaster
             // 
             this.radIdleMostDrops.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.radIdleMostDrops.Location = new System.Drawing.Point(7, 52);
+            this.radIdleMostDrops.Location = new System.Drawing.Point(7, 35);
             this.radIdleMostDrops.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radIdleMostDrops.Name = "radIdleMostDrops";
             this.radIdleMostDrops.Size = new System.Drawing.Size(379, 17);
@@ -228,7 +213,7 @@ namespace IdleMaster
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(330, 324);
+            this.btnCancel.Location = new System.Drawing.Point(330, 310);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 28);
@@ -240,7 +225,7 @@ namespace IdleMaster
             // btnOK
             // 
             this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOK.Location = new System.Drawing.Point(249, 324);
+            this.btnOK.Location = new System.Drawing.Point(249, 310);
             this.btnOK.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 28);
@@ -253,7 +238,7 @@ namespace IdleMaster
             // 
             this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnAdvanced.Image = global::IdleMaster.Properties.Resources.imgLock;
-            this.btnAdvanced.Location = new System.Drawing.Point(13, 308);
+            this.btnAdvanced.Location = new System.Drawing.Point(13, 294);
             this.btnAdvanced.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnAdvanced.Name = "btnAdvanced";
             this.btnAdvanced.Size = new System.Drawing.Size(41, 48);
@@ -323,7 +308,7 @@ namespace IdleMaster
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(417, 365);
+            this.ClientSize = new System.Drawing.Size(417, 351);
             this.Controls.Add(this.grpIdlingQuantity);
             this.Controls.Add(this.btnAdvanced);
             this.Controls.Add(this.btnOK);
@@ -357,7 +342,6 @@ namespace IdleMaster
         private RadioButton radIdleDefault;
         private Button btnCancel;
         private Button btnOK;
-        private RadioButton radIdleMostValue;
         private Button btnAdvanced;
         private ToolTip ttHints;
         private CheckBox chkIgnoreClientStatus;

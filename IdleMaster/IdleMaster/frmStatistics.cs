@@ -41,6 +41,7 @@ namespace IdleMaster
                         sessionMinutesIdled.Minutes,
                         sessionMinutesIdled.Minutes == 1 ? "" : "s");
             }
+
             lblSessionCards.Text = statistics.getSessionCardIdled().ToString() + " cards idled";
 
             //Total
@@ -58,6 +59,7 @@ namespace IdleMaster
                     totalMinutesIdled.Minutes,
                     totalMinutesIdled.Minutes == 1 ? "" : "s");
             }
+
             lblTotalCards.Text = Properties.Settings.Default.totalCardIdled.ToString() + " cards idled";
         }
 

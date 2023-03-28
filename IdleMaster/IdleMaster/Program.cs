@@ -32,24 +32,7 @@ namespace IdleMaster
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            while (true)
-            {
-                int LastMode = Mode;
-                switch (Mode)
-                {
-                    case 0:
-                        Application.Run(new frmMain());
-                        break;
-                    case 1:
-                        Application.Run(new AlwaysIdleList());
-                        break;
-                }
-
-                if (LastMode == Mode)
-                {
-                    break;
-                }
-            }            
+            Application.Run(new frmMain());
         }
 
         public static DialogResult ShowInputDialog(ref string input,string Title="Input",IWin32Window owner=null)
