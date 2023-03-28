@@ -8,61 +8,59 @@ using System.Text;
 
 namespace IdleMaster
 {
-    public partial class frmSettings : Form
+    public partial class FrmSettings : Form
     {
-        [DllImport("kernel32")]
-        private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
-        public frmSettings()
+        public FrmSettings()
         {
             InitializeComponent();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object sender, EventArgs e)
         {
-            if (radIdleDefault.Checked)
+            if (RbnIdleDefault.Checked)
             {
                 Settings.Default.sort = "default";
             }
             
-            if (radIdleLeastDrops.Checked)
+            if (RbnIdleLeastDrops.Checked)
             {
                 Settings.Default.sort = "leastcards";
             }
 
-            if (radIdleMostDrops.Checked)
+            if (RbnIdleMostDrops.Checked)
             {
                 Settings.Default.sort = "mostcards";
             }
 
-            if (cboLanguage.Text != "")
+            if (CbxLanguage.Text != "")
             {
-                if (cboLanguage.Text != Settings.Default.language)
+                if (CbxLanguage.Text != Settings.Default.language)
                 {
                     MessageBox.Show(localization.strings.please_restart);
                 }
 
-                Settings.Default.language = cboLanguage.Text;
+                Settings.Default.language = CbxLanguage.Text;
             }
 
-            if (radOneThenMany.Checked)
+            if (RbnOneThenMany.Checked)
             {
                 Settings.Default.OnlyOneGameIdle = false;
                 Settings.Default.OneThenMany = true;
             }
             else
             {
-                Settings.Default.OnlyOneGameIdle = radOneGameOnly.Checked && !radManyThenOne.Checked;
+                Settings.Default.OnlyOneGameIdle = RbnOneGameOnly.Checked && !RbnManyThenOne.Checked;
                 Settings.Default.OneThenMany = false;
             }
 
-            Settings.Default.minToTray = chkMinToTray.Checked;
-            Settings.Default.ignoreclient = chkIgnoreClientStatus.Checked;
-            Settings.Default.showUsername = chkShowUsername.Checked;
+            Settings.Default.minToTray = ChbMinToTray.Checked;
+            Settings.Default.ignoreclient = ChbIgnoreClientStatus.Checked;
+            Settings.Default.showUsername = ChbShowUsername.Checked;
             Settings.Default.Save();
             Close();
         }
@@ -91,13 +89,12 @@ namespace IdleMaster
             }
         }
     
-
-        private void frmSettings_Load(object sender, EventArgs e)
+        private void FrmSettings_Load(object sender, EventArgs e)
         {
             LoadForm();
             if (Settings.Default.language != "")
             {
-                cboLanguage.SelectedItem = Settings.Default.language;
+                CbxLanguage.SelectedItem = Settings.Default.language;
             }
             else
             {
@@ -106,10 +103,10 @@ namespace IdleMaster
                     case "Chinese (Simplified, China)":
                     case "Chinese (Traditional, China)":
                     case "Portuguese (Brazil)":
-                        cboLanguage.SelectedItem = Thread.CurrentThread.CurrentUICulture.EnglishName;
+                        CbxLanguage.SelectedItem = Thread.CurrentThread.CurrentUICulture.EnglishName;
                         break;
                     default:
-                        cboLanguage.SelectedItem = Regex.Replace(Thread.CurrentThread.CurrentUICulture.EnglishName, @"\(.+\)", "").Trim();
+                        CbxLanguage.SelectedItem = Regex.Replace(Thread.CurrentThread.CurrentUICulture.EnglishName, @"\(.+\)", "").Trim();
                         break;
                 }
             }
@@ -117,10 +114,10 @@ namespace IdleMaster
             switch (Settings.Default.sort)
             {
                 case "leastcards":
-                    radIdleLeastDrops.Checked = true;
+                    RbnIdleLeastDrops.Checked = true;
                     break;
                 case "mostcards":
-                    radIdleMostDrops.Checked = true;
+                    RbnIdleMostDrops.Checked = true;
                     break;
                 default:
                     break;
@@ -128,68 +125,68 @@ namespace IdleMaster
 
             // Load translation
             this.Text = localization.strings.idle_master_settings;
-            grpGeneral.Text = localization.strings.general;
-            grpIdlingQuantity.Text = localization.strings.idling_behavior;
-            grpPriority.Text = localization.strings.idling_order;
-            btnOK.Text = localization.strings.accept;
-            btnCancel.Text = localization.strings.cancel;
-            ttHints.SetToolTip(btnAdvanced, localization.strings.advanced_auth);
-            chkMinToTray.Text = localization.strings.minimize_to_tray;
-            ttHints.SetToolTip(chkMinToTray, localization.strings.minimize_to_tray);
-            chkIgnoreClientStatus.Text = localization.strings.ignore_client_status;
-            ttHints.SetToolTip(chkIgnoreClientStatus, localization.strings.ignore_client_status);
-            chkShowUsername.Text = localization.strings.show_username;
-            ttHints.SetToolTip(chkShowUsername, localization.strings.show_username);
-            radOneGameOnly.Text = localization.strings.idle_individual;
-            ttHints.SetToolTip(radOneGameOnly, localization.strings.idle_individual);
+            GrpGeneral.Text = localization.strings.general;
+            GrpIdlingQuantity.Text = localization.strings.idling_behavior;
+            GrpPriority.Text = localization.strings.idling_order;
+            BtnOk.Text = localization.strings.accept;
+            BtnCancel.Text = localization.strings.cancel;
+            TtpHints.SetToolTip(BtnAdvanced, localization.strings.advanced_auth);
+            ChbMinToTray.Text = localization.strings.minimize_to_tray;
+            TtpHints.SetToolTip(ChbMinToTray, localization.strings.minimize_to_tray);
+            ChbIgnoreClientStatus.Text = localization.strings.ignore_client_status;
+            TtpHints.SetToolTip(ChbIgnoreClientStatus, localization.strings.ignore_client_status);
+            ChbShowUsername.Text = localization.strings.show_username;
+            TtpHints.SetToolTip(ChbShowUsername, localization.strings.show_username);
+            RbnOneGameOnly.Text = localization.strings.idle_individual;
+            TtpHints.SetToolTip(RbnOneGameOnly, localization.strings.idle_individual);
 
             //以下为魔改代码
             //radManyThenOne.Text = localization.strings.idle_simultaneous;
             //ttHints.SetToolTip(radManyThenOne, localization.strings.idle_simultaneous);
             //radOneThenMany.Text = localization.strings.idle_onethenmany;
             //ttHints.SetToolTip(radOneThenMany, localization.strings.idle_onethenmany);
-            radManyThenOne.Text = localization.strings.idle_simultaneous.Replace("2", MinRuntime_s);
-            ttHints.SetToolTip(radManyThenOne, localization.strings.idle_simultaneous.Replace("2", MinRuntime_s));
-            radOneThenMany.Text = localization.strings.idle_onethenmany.Replace("2", MinRuntime_s);
-            ttHints.SetToolTip(radOneThenMany, localization.strings.idle_onethenmany.Replace("2", MinRuntime_s));
+            RbnManyThenOne.Text = localization.strings.idle_simultaneous.Replace("2", MinRuntime_s);
+            TtpHints.SetToolTip(RbnManyThenOne, localization.strings.idle_simultaneous.Replace("2", MinRuntime_s));
+            RbnOneThenMany.Text = localization.strings.idle_onethenmany.Replace("2", MinRuntime_s);
+            TtpHints.SetToolTip(RbnOneThenMany, localization.strings.idle_onethenmany.Replace("2", MinRuntime_s));
 
-            radIdleDefault.Text = localization.strings.order_default;
-            ttHints.SetToolTip(radIdleDefault, localization.strings.order_default);
-            radIdleMostDrops.Text = localization.strings.order_most;
-            ttHints.SetToolTip(radIdleMostDrops, localization.strings.order_most);
-            radIdleLeastDrops.Text = localization.strings.order_least;
-            ttHints.SetToolTip(radIdleLeastDrops, localization.strings.order_least);
-            lblLanguage.Text = localization.strings.interface_language;
+            RbnIdleDefault.Text = localization.strings.order_default;
+            TtpHints.SetToolTip(RbnIdleDefault, localization.strings.order_default);
+            RbnIdleMostDrops.Text = localization.strings.order_most;
+            TtpHints.SetToolTip(RbnIdleMostDrops, localization.strings.order_most);
+            RbnIdleLeastDrops.Text = localization.strings.order_least;
+            TtpHints.SetToolTip(RbnIdleLeastDrops, localization.strings.order_least);
+            LblLanguage.Text = localization.strings.interface_language;
 
             if (Settings.Default.OneThenMany)
             {
-                radOneThenMany.Checked = true;
+                RbnOneThenMany.Checked = true;
             }
             else
             {
-                radOneGameOnly.Checked = Settings.Default.OnlyOneGameIdle;
-                radManyThenOne.Checked = !Settings.Default.OnlyOneGameIdle;
+                RbnOneGameOnly.Checked = Settings.Default.OnlyOneGameIdle;
+                RbnManyThenOne.Checked = !Settings.Default.OnlyOneGameIdle;
             }
 
             if (Settings.Default.minToTray)
             {
-                chkMinToTray.Checked = true;
+                ChbMinToTray.Checked = true;
             }
 
             if (Settings.Default.ignoreclient)
             {
-                chkIgnoreClientStatus.Checked = true;
+                ChbIgnoreClientStatus.Checked = true;
             }
 
             if (Settings.Default.showUsername)
             {
-                chkShowUsername.Checked = true;
+                ChbShowUsername.Checked = true;
             }
         }
 
-        private void btnAdvanced_Click(object sender, EventArgs e)
+        private void BtnAdvanced_Click(object sender, EventArgs e)
         {
-            var frm = new frmSettingsAdvanced();
+            var frm = new FrmSettingsAdvanced();
             frm.ShowDialog();
         }
     }

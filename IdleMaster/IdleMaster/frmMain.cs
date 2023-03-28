@@ -6,52 +6,49 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Management;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using IdleMaster.Properties;
-using Newtonsoft.Json;
 using Steamworks;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using System.Globalization;
 using System.Security.Principal;
-using System.Runtime.InteropServices;
 
 namespace IdleMaster
 {
-    public partial class frmMain : Form
+    public partial class FrmMain : Form
     {
-        private Statistics statistics = new Statistics();
-        public List<Badge> AllBadges { get; set; }
+        private readonly Statistics statistics = new Statistics();
+        private bool isCookieReady;
+        private bool isSteamReady;
+        private int timeLeft = 900;
+        private int retryCount = 0;
+        private int reloadCount = 0;
+        private List<Badge> allBadges;
+        private Badge currentBadge;
+        private int minRuntime = 2;
 
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string section, string key, string defVal, StringBuilder retVal, int size, string filePath);
-        public IEnumerable<Badge> CanIdleBadges
-        {
-            get { return AllBadges.Where(b => b.RemainingCard != 0); }
-        }
-
-        public bool IsCookieReady;
-        public bool IsSteamReady;
-        public int TimeLeft = 900;
-        public int RetryCount = 0;
-        public int ReloadCount = 0;
-
+        public IEnumerable<Badge> CanIdleBadges { get { return allBadges.Where(b => b.RemainingCard != 0); } }
         public int CardsRemaining { get { return CanIdleBadges.Sum(b => b.RemainingCard); } }
         public int GamesRemaining { get { return CanIdleBadges.Count(); } }
-        public Badge CurrentBadge;
 
-        internal void UpdateStateInfo()
+        public FrmMain()
+        {
+            InitializeComponent();
+            allBadges = new List<Badge>();
+        }
+
+        private void UpdateStateInfo()
         {
             // Update totals
-            if (ReloadCount == 0)
+            if (reloadCount == 0)
             {
-                lblIdle.Text = string.Format("{0} " + localization.strings.games_left_to_idle + ", {1} " + localization.strings.idle_now + ".", GamesRemaining, CanIdleBadges.Count(b => b.InIdle));
-                lblDrops.Text = CardsRemaining + " " + localization.strings.card_drops_remaining;
-                lblIdle.Visible = GamesRemaining != 0;
-                lblDrops.Visible = CardsRemaining != 0;
+                LblIdle.Text = string.Format("{0} " + localization.strings.games_left_to_idle + ", {1} " + localization.strings.idle_now + ".", GamesRemaining, CanIdleBadges.Count(b => b.InIdle));
+                LblDrops.Text = CardsRemaining + " " + localization.strings.card_drops_remaining;
+                LblIdle.Visible = GamesRemaining != 0;
+                LblDrops.Visible = CardsRemaining != 0;
             }
         }
 
@@ -71,16 +68,16 @@ namespace IdleMaster
             }
         }
 
-        public void SortBadges(string method)
+        private void SortBadges(string method)
         {
-            lblDrops.Text = localization.strings.sorting_results;
+            LblDrops.Text = localization.strings.sorting_results;
             switch (method)
             {
                 case "mostcards":
-                    AllBadges = AllBadges.OrderByDescending(b => b.RemainingCard).ToList();
+                    allBadges = allBadges.OrderByDescending(b => b.RemainingCard).ToList();
                     break;
                 case "leastcards":
-                    AllBadges = AllBadges.OrderBy(b => b.RemainingCard).ToList();
+                    allBadges = allBadges.OrderBy(b => b.RemainingCard).ToList();
                     break;
                 //case "mostvalue":
                 //    try
@@ -110,18 +107,17 @@ namespace IdleMaster
                     return;
             }
         }
-
-        public int MinRuntime = 2;
-        public void UpdateIdleProcesses()
+                
+        private void UpdateIdleProcesses()
         {
-            foreach (var badge in CanIdleBadges.Where(b => !Equals(b, CurrentBadge)))
+            foreach (var badge in CanIdleBadges.Where(b => !Equals(b, currentBadge)))
             {
-                if (badge.HoursPlayed >= MinRuntime && badge.InIdle)
+                if (badge.HoursPlayed >= minRuntime && badge.InIdle)
                 {
                     badge.StopIdle();
                 }
 
-                if (badge.HoursPlayed < MinRuntime && CanIdleBadges.Count(b => b.InIdle) < 30)
+                if (badge.HoursPlayed < minRuntime && CanIdleBadges.Count(b => b.InIdle) < 30)
                 {
                     badge.Idle();
                 }
@@ -144,7 +140,7 @@ namespace IdleMaster
 
             // Check if user is authenticated and if any badge left to idle
             // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
-            if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !IsSteamReady)
+            if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !isSteamReady)
             {
                 ResetClientStatus();
             }
@@ -153,15 +149,15 @@ namespace IdleMaster
                 if (CanIdleBadges.Any())
                 {
                     // Give the user notification that the next game will start soon
-                    lblCurrentStatus.Text = localization.strings.loading_next;
+                    LblCurrentStatus.Text = localization.strings.loading_next;
 
                     // Make a short but random amount of time pass
                     var rand = new Random();
                     var wait = rand.Next(3, 9);
                     wait = wait * 1000;
 
-                    tmrStartNext.Interval = wait;
-                    tmrStartNext.Enabled = true;
+                    TmrStartNext.Interval = wait;
+                    TmrStartNext.Enabled = true;
                 }
                 else
                 {
@@ -202,22 +198,22 @@ namespace IdleMaster
 
             // Check if user is authenticated and if any badge left to idle
             // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
-            if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !IsSteamReady)
+            if (string.IsNullOrWhiteSpace(Settings.Default.sessionid) || !isSteamReady)
             {
                 ResetClientStatus();
             }
             else
             {
-                if (ReloadCount != 0)
+                if (reloadCount != 0)
                 {
                     return;
                 }
 
                 if (CanIdleBadges.Any())
                 {
-                    statistics.setRemainingCards((uint)CardsRemaining);
-                    tmrStatistics.Enabled = true;
-                    tmrStatistics.Start();
+                    statistics.SetRemainingCards((uint)CardsRemaining);
+                    TmrStatistics.Enabled = true;
+                    TmrStatistics.Start();
                     if (Settings.Default.OnlyOneGameIdle)
                     {
                         StartSoloIdle(CanIdleBadges.First());
@@ -226,7 +222,7 @@ namespace IdleMaster
                     {
                         if (Settings.Default.OneThenMany)
                         {
-                            var multi = CanIdleBadges.Where(b => b.HoursPlayed >= MinRuntime);
+                            var multi = CanIdleBadges.Where(b => b.HoursPlayed >= minRuntime);
                             if (multi.Count() >= 1)
                             {
                                 StartSoloIdle(multi.First());
@@ -238,7 +234,7 @@ namespace IdleMaster
                         }
                         else
                         {
-                            var multi = CanIdleBadges.Where(b => b.HoursPlayed < MinRuntime);
+                            var multi = CanIdleBadges.Where(b => b.HoursPlayed < minRuntime);
                             if (multi.Count() >= 2)
                             {
                                 StartMultipleIdle();
@@ -259,100 +255,100 @@ namespace IdleMaster
             }
         }
 
-        public void StartSoloIdle(Badge badge)
+        private void StartSoloIdle(Badge badge)
         {
             // Set the currentAppID value
-            CurrentBadge = badge;
+            currentBadge = badge;
 
             // Place user "In game" for card drops
-            CurrentBadge.Idle();
+            currentBadge.Idle();
 
             // Update game name
-            lblGameName.Visible = true;
-            lblGameName.Text = CurrentBadge.Name;
+            LblGameName.Visible = true;
+            LblGameName.Text = currentBadge.Name;
 
             GamesState.Visible = false;
-            gameToolStripMenuItem.Enabled = true;
+            MnuGame.Enabled = true;
 
             // Update game image            
             try
             {
-                picApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + CurrentBadge.StringId + "/header_292x136.jpg");
-                picApp.Visible = true;
+                PbxApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + currentBadge.StringId + "/header_292x136.jpg");
+                PbxApp.Visible = true;
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex, "frmMain -> StartIdle -> load pic, for id = " + CurrentBadge.AppId);
-                picApp.Image = Resources.NoImage;
-                picApp.Visible = true;
+                Logger.Exception(ex, "frmMain -> StartIdle -> load pic, for id = " + currentBadge.AppId);
+                PbxApp.Image = Resources.NoImage;
+                PbxApp.Visible = true;
             }
 
             // Update label controls
-            lblCurrentRemaining.Text = CurrentBadge.RemainingCard + " " + localization.strings.card_drops_remaining;
-            lblCurrentStatus.Text = "单线程";
-            lblHoursPlayed.Visible = true;
-            lblHoursPlayed.Text = CurrentBadge.HoursPlayed + " " + localization.strings.hrs_on_record;
+            LblCurrentRemaining.Text = currentBadge.RemainingCard + " " + localization.strings.card_drops_remaining;
+            LblCurrentStatus.Text = "Solo Idle";
+            LblHoursPlayed.Visible = true;
+            LblHoursPlayed.Text = currentBadge.HoursPlayed + " " + localization.strings.hrs_on_record;
 
             // Set progress bar values and show the footer
-            pbIdle.Maximum = CurrentBadge.RemainingCard;
-            pbIdle.Value = 0;
-            ssFooter.Visible = true;
+            PgrIdle.Maximum = currentBadge.RemainingCard;
+            PgrIdle.Value = 0;
+            StrFooter.Visible = true;
 
             // Start the animated "working" gif
-            picIdleStatus.Image = Resources.imgSpin;
+            PbxIdleStatus.Image = Resources.imgSpin;
 
             // Start the timer that will check if drops remain
-            tmrCardDropCheck.Enabled = true;
+            TmrCardDropCheck.Enabled = true;
 
             // Reset the timer
-            TimeLeft = CurrentBadge.RemainingCard == 1 ? 300 : 900;
+            timeLeft = currentBadge.RemainingCard == 1 ? 300 : 900;
 
             // Set the correct buttons on the form for pause / resume
-            btnResume.Visible = false;
-            btnPause.Visible = true;
-            btnSkip.Visible = true;
-            resumeIdlingToolStripMenuItem.Enabled = false;
-            pauseIdlingToolStripMenuItem.Enabled = false;
-            skipGameToolStripMenuItem.Enabled = false;
+            BtnResume.Visible = false;
+            BtnPause.Visible = true;
+            BtnSkip.Visible = true;
+            MnuGameResume.Enabled = false;
+            MnuGamePause.Enabled = false;
+            MnuGameSkip.Enabled = false;
 
             var scale = CreateGraphics().DpiY * 3.9;
             Height = Convert.ToInt32(scale);
         }
 
-        public void StartMultipleIdle()
+        private void StartMultipleIdle()
         {
             UpdateIdleProcesses();
 
             // Update label controls
-            lblCurrentRemaining.Text = localization.strings.update_games_status;
-            lblCurrentStatus.Text = "多线程";
+            LblCurrentRemaining.Text = localization.strings.update_games_status;
+            LblCurrentStatus.Text = "Multi Idle";
 
-            lblGameName.Visible = false;
-            lblHoursPlayed.Visible = false;
-            ssFooter.Visible = true;
-            gameToolStripMenuItem.Enabled = false;
+            LblGameName.Visible = false;
+            LblHoursPlayed.Visible = false;
+            StrFooter.Visible = true;
+            MnuGame.Enabled = false;
 
             // Start the animated "working" gif
-            picIdleStatus.Image = Resources.imgSpin;
+            PbxIdleStatus.Image = Resources.imgSpin;
 
             // Start the timer that will check if drops remain
-            tmrCardDropCheck.Enabled = true;
+            TmrCardDropCheck.Enabled = true;
 
             // Reset the timer
-            TimeLeft = 360;
+            timeLeft = 360;
 
             // Show game
             GamesState.Visible = true;
-            picApp.Visible = false;
+            PbxApp.Visible = false;
             RefreshGamesStateListView();
 
             // Set the correct buttons on the form for pause / resume
-            btnResume.Visible = false;
-            btnPause.Visible = false;
-            btnSkip.Visible = false;
-            resumeIdlingToolStripMenuItem.Enabled = false;
-            pauseIdlingToolStripMenuItem.Enabled = false;
-            skipGameToolStripMenuItem.Enabled = false;
+            BtnResume.Visible = false;
+            BtnPause.Visible = false;
+            BtnSkip.Visible = false;
+            MnuGameResume.Enabled = false;
+            MnuGamePause.Enabled = false;
+            MnuGameSkip.Enabled = false;
 
             var scale = CreateGraphics().DpiY * 3.86;
             Height = Convert.ToInt32(scale);
@@ -369,29 +365,29 @@ namespace IdleMaster
             }
         }
 
-        public void StopIdle()
+        private void StopIdle()
         {
             try
             {
-                lblGameName.Visible = false;
-                picApp.Image = null;
-                picApp.Visible = false;
+                LblGameName.Visible = false;
+                PbxApp.Image = null;
+                PbxApp.Visible = false;
                 GamesState.Visible = false;
-                btnPause.Visible = false;
-                btnSkip.Visible = false;
-                lblCurrentStatus.Text = localization.strings.not_ingame;
-                lblHoursPlayed.Visible = false;
-                picIdleStatus.Image = null;
+                BtnPause.Visible = false;
+                BtnSkip.Visible = false;
+                LblCurrentStatus.Text = localization.strings.not_ingame;
+                LblHoursPlayed.Visible = false;
+                PbxIdleStatus.Image = null;
 
                 // Stop the card drop check timer
-                tmrCardDropCheck.Enabled = false;
+                TmrCardDropCheck.Enabled = false;
 
                 // Stop the statistics timer
-                tmrStatistics.Stop();
-                tmrStatistics.Enabled = false;
+                TmrStatistics.Stop();
+                TmrStatistics.Enabled = false;
 
                 // Hide the status bar
-                ssFooter.Visible = false;
+                StrFooter.Visible = false;
 
                 // Resize the form
                 var graphics = CreateGraphics();
@@ -399,7 +395,7 @@ namespace IdleMaster
                 Height = Convert.ToInt32(scale);
 
                 // Kill the idling process
-                foreach (var badge in AllBadges.Where(b => b.InIdle))
+                foreach (var badge in allBadges.Where(b => b.InIdle))
                     badge.StopIdle();
             }
             catch (Exception ex)
@@ -408,15 +404,15 @@ namespace IdleMaster
             }
         }
 
-        public void IdleComplete()
+        private void IdleComplete()
         {
             // Deactivate the timer control and inform the user that the program is finished
-            tmrCardDropCheck.Enabled = false;
-            lblCurrentStatus.Text = localization.strings.idling_complete;
+            TmrCardDropCheck.Enabled = false;
+            LblCurrentStatus.Text = localization.strings.idling_complete;
 
-            lblGameName.Visible = false;
-            btnPause.Visible = false;
-            btnSkip.Visible = false;
+            LblGameName.Visible = false;
+            BtnPause.Visible = false;
+            BtnSkip.Visible = false;
 
             // Resize the form
             var graphics = CreateGraphics();
@@ -424,7 +420,7 @@ namespace IdleMaster
             Height = Convert.ToInt32(scale);
         }
 
-        public async Task LoadBadgesAsync()
+        private async Task LoadBadgesAsync()
         {
             // Settings.Default.myProfileURL = https://steamcommunity.com/id/USER
             // Refresh every time so it will be more stable            
@@ -441,8 +437,8 @@ namespace IdleMaster
                 // Response should be empty. User should be unauthorised.
                 if (string.IsNullOrEmpty(response))
                 {
-                    RetryCount++;
-                    if (RetryCount == 18)
+                    retryCount++;
+                    if (retryCount == 18)
                     {
                         ResetClientStatus();
                         return;
@@ -496,26 +492,26 @@ namespace IdleMaster
             {
                 Logger.Exception(ex, "Badge -> LoadBadgesAsync, for profile = " + Settings.Default.myProfileURL);
                 // badge page didn't load
-                picReadingPage.Image = null;
-                picIdleStatus.Image = null;
-                lblDrops.Text = localization.strings.badge_didnt_load.Replace("__num__", "10");
-                lblIdle.Text = "";
+                PbxReadingPage.Image = null;
+                PbxIdleStatus.Image = null;
+                LblDrops.Text = localization.strings.badge_didnt_load.Replace("__num__", "10");
+                LblIdle.Text = "";
 
                 // Set the form height
                 var graphics = CreateGraphics();
                 var scale = graphics.DpiY * 1.625;
                 Height = Convert.ToInt32(scale);
-                ssFooter.Visible = false;
+                StrFooter.Visible = false;
 
-                ReloadCount = 1;
-                tmrBadgeReload.Enabled = true;
+                reloadCount = 1;
+                TmrBadgeReload.Enabled = true;
                 return;
             }
 
-            RetryCount = 0;
+            retryCount = 0;
             SortBadges(Settings.Default.sort);
 
-            picReadingPage.Visible = false;
+            PbxReadingPage.Visible = false;
             UpdateStateInfo();
 
             if (CardsRemaining == 0)
@@ -524,10 +520,6 @@ namespace IdleMaster
             }
         }
 
-        /// <summary>
-        /// Processes all badges on page
-        /// </summary>
-        /// <param name="document">HTML document (1 page) from x</param>
         private void ProcessBadgesOnPage(HtmlDocument document)
         {
             var badges = document.DocumentNode.SelectNodes("//div[@class=\"badge_row is_link\"]");
@@ -555,41 +547,35 @@ namespace IdleMaster
                 var cardNode = badge.SelectSingleNode(".//span[@class=\"progress_info_bold\"]");
                 var cards = cardNode == null ? string.Empty : Regex.Match(cardNode.InnerText, @"[0-9]+").Value;
 
-                var badgeInMemory = AllBadges.FirstOrDefault(b => b.StringId == appid);
+                var badgeInMemory = allBadges.FirstOrDefault(b => b.StringId == appid);
                 if (badgeInMemory != null)
                 {
                     badgeInMemory.UpdateStats(cards, hours);
                 }
                 else
                 {
-                    AllBadges.Add(new Badge(appid, name, cards, hours));
+                    allBadges.Add(new Badge(appid, name, cards, hours));
                 }
             }
         }
 
-        public async Task CheckCardDrops(Badge badge)
+        private async Task CheckCardDrops(Badge badge)
         {
             if (!await badge.CanCardDrops())
                 NextIdle();
             else
             {
                 // Resets the clock based on the number of remaining drops
-                TimeLeft = badge.RemainingCard == 1 ? 300 : 900;
+                timeLeft = badge.RemainingCard == 1 ? 300 : 900;
             }
 
-            lblCurrentRemaining.Text = badge.RemainingCard + " " + localization.strings.card_drops_remaining;
-            pbIdle.Value = pbIdle.Maximum - badge.RemainingCard;
-            lblHoursPlayed.Text = badge.HoursPlayed + " " + localization.strings.hrs_on_record;
+            LblCurrentRemaining.Text = badge.RemainingCard + " " + localization.strings.card_drops_remaining;
+            PgrIdle.Value = PgrIdle.Maximum - badge.RemainingCard;
+            LblHoursPlayed.Text = badge.HoursPlayed + " " + localization.strings.hrs_on_record;
             UpdateStateInfo();
         }
-
-        public frmMain()
-        {
-            InitializeComponent();
-            AllBadges = new List<Badge>();
-        }
-
-        private void frmMain_Load(object sender, EventArgs e)
+        
+        private void FrmMain_Load(object sender, EventArgs e)
         {
             // Copy external references to the output directory.  This allows ClickOnce install.
             if (File.Exists(Environment.CurrentDirectory + "\\steam_api.dll") == false)
@@ -706,26 +692,26 @@ namespace IdleMaster
             }
 
             // Localize form elements
-            fileToolStripMenuItem.Text = localization.strings.file;
-            gameToolStripMenuItem.Text = localization.strings.game;
-            helpToolStripMenuItem.Text = localization.strings.help;
-            settingsToolStripMenuItem.Text = localization.strings.settings;
-            blacklistToolStripMenuItem.Text = localization.strings.blacklist;
-            exitToolStripMenuItem.Text = localization.strings.exit;
-            pauseIdlingToolStripMenuItem.Text = localization.strings.pause_idling;
-            resumeIdlingToolStripMenuItem.Text = localization.strings.resume_idling;
-            skipGameToolStripMenuItem.Text = localization.strings.skip_current_game;
-            blacklistCurrentGameToolStripMenuItem.Text = localization.strings.blacklist_current_game;
-            statisticsToolStripMenuItem.Text = localization.strings.statistics;
-            changelogToolStripMenuItem.Text = localization.strings.release_notes;
-            officialGroupToolStripMenuItem.Text = localization.strings.official_group;
-            aboutToolStripMenuItem.Text = localization.strings.about;
-            lnkSignIn.Text = "(" + localization.strings.sign_in + ")";
-            lnkResetCookies.Text = "(" + localization.strings.sign_out + ")";
-            toolStripStatusLabel1.Text = localization.strings.next_check;
-            toolStripStatusLabel1.ToolTipText = localization.strings.next_check;
+            MnuFile.Text = localization.strings.file;
+            MnuGame.Text = localization.strings.game;
+            MnuHelp.Text = localization.strings.help;
+            MnuFileSettings.Text = localization.strings.settings;
+            MnuFileBlacklist.Text = localization.strings.blacklist;
+            MnuFileExit.Text = localization.strings.exit;
+            MnuGamePause.Text = localization.strings.pause_idling;
+            MnuGameResume.Text = localization.strings.resume_idling;
+            MnuGameSkip.Text = localization.strings.skip_current_game;
+            MnuGameBlacklist.Text = localization.strings.blacklist_current_game;
+            MnuHelpStats.Text = localization.strings.statistics;
+            MnuHelpChangelog.Text = localization.strings.release_notes;
+            MnuHelpOfficial.Text = localization.strings.official_group;
+            MnuHelpAbout.Text = localization.strings.about;
+            LnkSignIn.Text = "(" + localization.strings.sign_in + ")";
+            LnkResetCookies.Text = "(" + localization.strings.sign_out + ")";
+            LblNextCheck.Text = localization.strings.next_check;
+            LblNextCheck.ToolTipText = localization.strings.next_check;
 
-            lblSignedOnAs.Text = localization.strings.signed_in_as;
+            LblSignedOnAs.Text = localization.strings.signed_in_as;
             GamesState.Columns[0].Text = localization.strings.name;
             GamesState.Columns[1].Text = localization.strings.hours;
 
@@ -735,55 +721,52 @@ namespace IdleMaster
             Height = Convert.ToInt32(scale);
 
             // Set the location of certain elements so that they scale correctly for different DPI settings
-            var point = new Point(Convert.ToInt32(graphics.DpiX * 1.14), Convert.ToInt32(lblGameName.Location.Y));
-            lblGameName.Location = point;
-            point = new Point(Convert.ToInt32(graphics.DpiX * 2.35), Convert.ToInt32(lnkSignIn.Location.Y));
-            lnkSignIn.Location = point;
-            point = new Point(Convert.ToInt32(graphics.DpiX * 2.15), Convert.ToInt32(lnkResetCookies.Location.Y));
-            lnkResetCookies.Location = point;
+            var point = new Point(Convert.ToInt32(graphics.DpiX * 1.14), Convert.ToInt32(LblGameName.Location.Y));
+            LblGameName.Location = point;
+            point = new Point(Convert.ToInt32(graphics.DpiX * 2.35), Convert.ToInt32(LnkSignIn.Location.Y));
+            LnkSignIn.Location = point;
+            point = new Point(Convert.ToInt32(graphics.DpiX * 2.15), Convert.ToInt32(LnkResetCookies.Location.Y));
+            LnkResetCookies.Location = point;
         }
 
-        private void frmMain_FormClose(object sender, FormClosedEventArgs e)
+        private void FrmMain_FormClose(object sender, FormClosedEventArgs e)
         {
             StopIdle();
         }
 
-        private void tmrCheckCookieData_Tick(object sender, EventArgs e)
+        private void TmrCheckCookieData_Tick(object sender, EventArgs e)
         {
             var connected = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && !string.IsNullOrWhiteSpace(Settings.Default.steamLoginSecure);
-            lblCookieStatus.Text = connected ? localization.strings.idle_master_connected : localization.strings.idle_master_notconnected;
-            lblCookieStatus.ForeColor = connected ? Color.Green : Color.Black;
-            picCookieStatus.Image = connected ? Resources.imgTrue : Resources.imgFalse;
-            lnkSignIn.Visible = !connected;
-            lnkResetCookies.Visible = connected;
-            IsCookieReady = connected;
+            LblCookieStatus.Text = connected ? localization.strings.idle_master_connected : localization.strings.idle_master_notconnected;
+            LblCookieStatus.ForeColor = connected ? Color.Green : Color.Black;
+            PbxCookieStatus.Image = connected ? Resources.imgTrue : Resources.imgFalse;
+            LnkSignIn.Visible = !connected;
+            LnkResetCookies.Visible = connected;
+            isCookieReady = connected;
         }
 
-        private void tmrCheckSteam_Tick(object sender, EventArgs e)
+        private void TmrCheckSteam_Tick(object sender, EventArgs e)
         {
             var isSteamRunning = SteamAPI.IsSteamRunning() || Settings.Default.ignoreclient;
-            lblSteamStatus.Text = isSteamRunning ? (Settings.Default.ignoreclient ? localization.strings.steam_ignored : localization.strings.steam_running) : localization.strings.steam_notrunning;
-            lblSteamStatus.ForeColor = isSteamRunning ? Color.Green : Color.Black;
-            picSteamStatus.Image = isSteamRunning ? Resources.imgTrue : Resources.imgFalse;
-            tmrCheckSteam.Interval = isSteamRunning ? 5000 : 500;
-            skipGameToolStripMenuItem.Enabled = isSteamRunning;
-            pauseIdlingToolStripMenuItem.Enabled = isSteamRunning;
-            IsSteamReady = isSteamRunning;
+            LblSteamStatus.Text = isSteamRunning ? (Settings.Default.ignoreclient ? localization.strings.steam_ignored : localization.strings.steam_running) : localization.strings.steam_notrunning;
+            LblSteamStatus.ForeColor = isSteamRunning ? Color.Green : Color.Black;
+            PbxSteamStatus.Image = isSteamRunning ? Resources.imgTrue : Resources.imgFalse;
+            TmrCheckSteam.Interval = isSteamRunning ? 5000 : 500;
+            MnuGameSkip.Enabled = isSteamRunning;
+            MnuGamePause.Enabled = isSteamRunning;
+            isSteamReady = isSteamRunning;
         }
 
-        private void lblGameName_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LblGameName_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://store.steampowered.com/app/" + CurrentBadge.AppId);
+            Process.Start("https://store.steampowered.com/app/" + currentBadge.AppId);
         }
 
-        private void lnkResetCookies_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LnkResetCookies_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             ResetClientStatus();
         }
 
-        /// <summary>
-        /// Performs reset to initial state
-        /// </summary>
         private void ResetClientStatus()
         {
             // Clear the settings
@@ -798,7 +781,7 @@ namespace IdleMaster
             StopIdle();
 
             // Clear the badges list
-            AllBadges.Clear();
+            allBadges.Clear();
 
             // Resize the form
             var graphics = CreateGraphics();
@@ -806,60 +789,60 @@ namespace IdleMaster
             Height = Convert.ToInt32(scale);
 
             // Set timer intervals
-            tmrCheckSteam.Interval = 500;
-            tmrCheckCookieData.Interval = 500;
+            TmrCheckSteam.Interval = 500;
+            TmrCheckCookieData.Interval = 500;
 
             // Hide signed user name
             if (Settings.Default.showUsername)
             {
-                lblSignedOnAs.Text = String.Empty;
-                lblSignedOnAs.Visible = false;
+                LblSignedOnAs.Text = String.Empty;
+                LblSignedOnAs.Visible = false;
             }
 
             // Hide spinners
-            picReadingPage.Visible = false;
+            PbxReadingPage.Visible = false;
 
             // Hide lblDrops and lblIdle
-            lblDrops.Visible = false;
-            lblIdle.Visible = false;
+            LblDrops.Visible = false;
+            LblIdle.Visible = false;
 
             // Set IsCookieReady to false
-            IsCookieReady = false;
+            isCookieReady = false;
 
             // Re-enable tmrReadyToGo
-            tmrReadyToGo.Enabled = true;
+            TmrReadyToGo.Enabled = true;
         }
 
-        private void lnkSignIn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LnkSignIn_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var frm = new frmBrowser();
+            var frm = new FrmBrowser();
             frm.ShowDialog();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuFileExit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private async void tmrReadyToGo_Tick(object sender, EventArgs e)
+        private async void TmrReadyToGo_Tick(object sender, EventArgs e)
         {
 
-            if (!IsCookieReady || !IsSteamReady)
+            if (!isCookieReady || !isSteamReady)
                 return;
 
             // Update the form elements
             if (Settings.Default.showUsername)
             {
-                lblSignedOnAs.Text = SteamProfile.GetSignedAs();
-                lblSignedOnAs.Visible = true;
+                LblSignedOnAs.Text = SteamProfile.GetSignedAs();
+                LblSignedOnAs.Visible = true;
             }
 
-            lblDrops.Visible = true;
-            lblDrops.Text = localization.strings.reading_badge_page + ", " + localization.strings.please_wait;
-            lblIdle.Visible = false;
-            picReadingPage.Visible = true;
+            LblDrops.Visible = true;
+            LblDrops.Text = localization.strings.reading_badge_page + ", " + localization.strings.please_wait;
+            LblIdle.Visible = false;
+            PbxReadingPage.Visible = true;
 
-            tmrReadyToGo.Enabled = false;
+            TmrReadyToGo.Enabled = false;
 
             // Call the loadBadges() function asynchronously
             await LoadBadgesAsync();
@@ -867,242 +850,193 @@ namespace IdleMaster
             StartIdle();
         }
 
-        private async void tmrCardDropCheck_Tick(object sender, EventArgs e)
+        private async void TmrCardDropCheck_Tick(object sender, EventArgs e)
         {
-            if (TimeLeft <= 0)
+            if (timeLeft <= 0)
             {
-                tmrCardDropCheck.Enabled = false;
-                if (CurrentBadge != null)
+                TmrCardDropCheck.Enabled = false;
+                if (currentBadge != null)
                 {
-                    CurrentBadge.Idle();
-                    await CheckCardDrops(CurrentBadge);
+                    currentBadge.Idle();
+                    await CheckCardDrops(currentBadge);
                 }
 
-                var isMultipleIdle = CanIdleBadges.Any(b => !Equals(b, CurrentBadge) && b.InIdle);
+                var isMultipleIdle = CanIdleBadges.Any(b => !Equals(b, currentBadge) && b.InIdle);
                 if (isMultipleIdle)
                 {
                     await LoadBadgesAsync();
                     UpdateIdleProcesses();
 
-                    isMultipleIdle = CanIdleBadges.Any(b => b.HoursPlayed < MinRuntime && b.InIdle);
+                    isMultipleIdle = CanIdleBadges.Any(b => b.HoursPlayed < minRuntime && b.InIdle);
                     if (isMultipleIdle)
-                        TimeLeft = 360;
+                        timeLeft = 360;
                 }
 
                 // Check if user is authenticated and if any badge left to idle
                 // There should be check for IsCookieReady, but property is set in timer tick, so it could take some time to be set.
-                tmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && IsSteamReady && CanIdleBadges.Any() && TimeLeft != 0;
+                TmrCardDropCheck.Enabled = !string.IsNullOrWhiteSpace(Settings.Default.sessionid) && isSteamReady && CanIdleBadges.Any() && timeLeft != 0;
             }
             else
             {
-                TimeLeft = TimeLeft - 1;
-                lblTimer.Text = TimeSpan.FromSeconds(TimeLeft).ToString(@"mm\:ss");
+                timeLeft = timeLeft - 1;
+                LblTimer.Text = TimeSpan.FromSeconds(timeLeft).ToString(@"mm\:ss");
             }
         }
-        //private void btnSkip_Click(object sender, EventArgs e)
-        //{
-        //    if (!IsSteamReady)
-        //        return;
 
-        //    StopIdle();
-        //    AllBadges.RemoveAll(b => Equals(b, CurrentBadge));
-        //    StartIdle();
-        //}
-
-        //以下为魔改代码
-        private void btnSkip_Click(object sender, EventArgs e)
+        private void BtnSkip_Click(object sender, EventArgs e)
         {
             RunNextIdle();
         }
+
         private void RunNextIdle()
         {
-            if (!IsSteamReady)
+            if (!isSteamReady)
                 return;
 
             StopIdle();
-            AllBadges.RemoveAll(b => Equals(b, CurrentBadge));
+            allBadges.RemoveAll(b => Equals(b, currentBadge));
             StartIdle();
         }
-        //结束
-        private void btnPause_Click(object sender, EventArgs e)
+        
+        private void BtnPause_Click(object sender, EventArgs e)
         {
-            if (!IsSteamReady)
+            if (!isSteamReady)
                 return;
 
             // Stop the steam-idle process
             StopIdle();
 
             // Indicate to the user that idling has been paused
-            lblCurrentStatus.Text = localization.strings.idling_paused;
+            LblCurrentStatus.Text = localization.strings.idling_paused;
 
             // Set the correct button visibility
-            btnResume.Visible = true;
-            btnPause.Visible = false;
-            pauseIdlingToolStripMenuItem.Enabled = false;
-            resumeIdlingToolStripMenuItem.Enabled = true;
+            BtnResume.Visible = true;
+            BtnPause.Visible = false;
+            MnuGamePause.Enabled = false;
+            MnuGameResume.Enabled = true;
 
             // Focus the resume button
-            btnResume.Focus();
+            BtnResume.Focus();
         }
 
-        private void btnResume_Click(object sender, EventArgs e)
+        private void BtnResume_Click(object sender, EventArgs e)
         {
             // Resume idling
             StartIdle();
 
-            pauseIdlingToolStripMenuItem.Enabled = true;
-            resumeIdlingToolStripMenuItem.Enabled = false;
+            MnuGamePause.Enabled = true;
+            MnuGameResume.Enabled = false;
         }
 
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuFileSettings_Click(object sender, EventArgs e)
         {
             // Show the form
             String previous = Settings.Default.sort;
             Boolean previous_behavior = Settings.Default.OnlyOneGameIdle;
             Boolean previous_behavior2 = Settings.Default.OneThenMany;
-            Form frm = new frmSettings();
+            Form frm = new FrmSettings();
             frm.ShowDialog();
 
             if (previous != Settings.Default.sort || previous_behavior != Settings.Default.OnlyOneGameIdle || previous_behavior2 != Settings.Default.OneThenMany)
             {
                 StopIdle();
-                AllBadges.Clear();
-                tmrReadyToGo.Enabled = true;
+                allBadges.Clear();
+                TmrReadyToGo.Enabled = true;
             }
 
-            if (Settings.Default.showUsername && IsCookieReady)
+            if (Settings.Default.showUsername && isCookieReady)
             {
-                lblSignedOnAs.Text = SteamProfile.GetSignedAs();
-                lblSignedOnAs.Visible = Settings.Default.showUsername;
+                LblSignedOnAs.Text = SteamProfile.GetSignedAs();
+                LblSignedOnAs.Visible = Settings.Default.showUsername;
             }
         }
 
-        private void pauseIdlingToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuGamePause_Click(object sender, EventArgs e)
         {
-            btnPause.PerformClick();
+            BtnPause.PerformClick();
         }
 
-        private void resumeIdlingToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuGameResume_Click(object sender, EventArgs e)
         {
-            btnResume.PerformClick();
+            BtnResume.PerformClick();
         }
 
-        private void skipGameToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuGameSkip_Click(object sender, EventArgs e)
         {
-            btnSkip.PerformClick();
+            BtnSkip.PerformClick();
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuHelpAbout_Click(object sender, EventArgs e)
         {
-            var frm = new frmAbout();
+            var frm = new FrmAbout();
             frm.ShowDialog();
         }
 
-        private void frmMain_Resize(object sender, EventArgs e)
+        private void LblCurrentRemaining_Click(object sender, EventArgs e)
         {
-            if (WindowState == FormWindowState.Minimized)
+            if (timeLeft > 2)
             {
-                if (Settings.Default.minToTray)
-                {
-                    notifyIcon1.Visible = true;
-                    Hide();
-                }
-            }
-            else if (WindowState == FormWindowState.Normal)
-            {
-                notifyIcon1.Visible = false;
+                timeLeft = 2;
             }
         }
 
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void MnuFileBlacklist_Click(object sender, EventArgs e)
         {
-            Show();
-            WindowState = FormWindowState.Normal;
-            this.notifyIcon1.Visible = false;
-        }
-
-        private void lblCurrentRemaining_Click(object sender, EventArgs e)
-        {
-            if (TimeLeft > 2)
-            {
-                TimeLeft = 2;
-            }
-        }
-
-        private void blacklistToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var frm = new frmBlacklist();
+            var frm = new FrmBlacklist();
             frm.ShowDialog();
 
-            if (Settings.Default.blacklist.Cast<string>().Any(appid => appid == CurrentBadge.StringId))
-                btnSkip.PerformClick();
+            if (Settings.Default.blacklist.Cast<string>().Any(appid => appid == currentBadge.StringId))
+                BtnSkip.PerformClick();
         }
 
-        private void blacklistCurrentGameToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuGameBlacklist_Click(object sender, EventArgs e)
         {
-            Settings.Default.blacklist.Add(CurrentBadge.StringId);
+            Settings.Default.blacklist.Add(currentBadge.StringId);
             Settings.Default.Save();
 
-            btnSkip.PerformClick();
+            BtnSkip.PerformClick();
         }
 
-        private void tmrStartNext_Tick(object sender, EventArgs e)
+        private void TmrStartNext_Tick(object sender, EventArgs e)
         {
-            tmrStartNext.Enabled = false;
+            TmrStartNext.Enabled = false;
             StartIdle();
         }
 
-        private void changelogToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuHelpChangelog_Click(object sender, EventArgs e)
         {
-            var frm = new frmChangelog();
+            var frm = new FrmChangelog();
             frm.Show();
         }
 
-        private void statisticsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuHelpStatistics_Click(object sender, EventArgs e)
         {
-            var frm = new frmStatistics(statistics);
+            var frm = new FrmStatistics(statistics);
             frm.ShowDialog();
         }
 
-        private void officialGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        private void MnuHelpOfficial_Click(object sender, EventArgs e)
         {
             Process.Start("https://steamcommunity.com/groups/idlemastery");
         }
 
-        private void tmrBadgeReload_Tick(object sender, EventArgs e)
+        private void TmrBadgeReload_Tick(object sender, EventArgs e)
         {
-            ReloadCount = ReloadCount + 1;
-            lblDrops.Text = localization.strings.badge_didnt_load.Replace("__num__", (10 - ReloadCount).ToString());
+            reloadCount = reloadCount + 1;
+            LblDrops.Text = localization.strings.badge_didnt_load.Replace("__num__", (10 - reloadCount).ToString());
 
-            if (ReloadCount == 10)
+            if (reloadCount == 10)
             {
-                tmrBadgeReload.Enabled = false;
-                tmrReadyToGo.Enabled = true;
-                ReloadCount = 0;
+                TmrBadgeReload.Enabled = false;
+                TmrReadyToGo.Enabled = true;
+                reloadCount = 0;
             }
         }
 
-        private void tmrStatistics_Tick(object sender, EventArgs e)
+        private void TmrStatistics_Tick(object sender, EventArgs e)
         {
-            statistics.increaseMinutesIdled();
-            statistics.checkCardRemaining((uint)CardsRemaining);
-        }
-
-        private void frmMain_SizeChanged(object sender, EventArgs e)
-        {
-            if (Settings.Default.minToTray)
-            {
-                if (this.WindowState == FormWindowState.Minimized)
-                {
-                    this.Hide();
-                    this.notifyIcon1.Visible = true;
-                }
-            }
-        }
-
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            Process.Start("https://steamcn.com/t367755-1-1");
+            statistics.IncreaseMinutesIdled();
+            statistics.CheckCardRemaining((uint)CardsRemaining);
         }
     }
 }

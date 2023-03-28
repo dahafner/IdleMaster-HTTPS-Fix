@@ -21,39 +21,36 @@
             return remainingCards;
         }
 
-        public void setRemainingCards(uint remainingCards)
+        public void SetRemainingCards(uint remainingCards)
         {
             this.remainingCards = remainingCards;
         }
 
-        public void checkCardRemaining(uint actualCardRemaining)
+        public void CheckCardRemaining(uint actualCardRemaining)
         {
             if (actualCardRemaining < remainingCards)
             {
-                increaseCardIdled(remainingCards - actualCardRemaining);
+                IncreaseCardIdled(remainingCards - actualCardRemaining);
                 remainingCards = actualCardRemaining;
             }
             else if (actualCardRemaining > remainingCards)
             {
                 remainingCards = actualCardRemaining;
             }
-
         }
 
-        public void increaseCardIdled(uint number)
+        private void IncreaseCardIdled(uint number)
         {
-            Properties.Settings.Default.totalCardIdled+=number;
+            Properties.Settings.Default.totalCardIdled += number;
             Properties.Settings.Default.Save();
-            sessionCardIdled+=number;
+            sessionCardIdled += number;
         }
 
-        public void increaseMinutesIdled()
+        public void IncreaseMinutesIdled()
         {
             Properties.Settings.Default.totalMinutesIdled++;
             Properties.Settings.Default.Save();
             sessionMinutesIdled++;
         }
-
-        
     }
 }

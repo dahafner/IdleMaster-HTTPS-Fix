@@ -6,47 +6,42 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using IdleMaster.Properties;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.WinForms;
 
 namespace IdleMaster
 {
-    public partial class frmBrowser : Form
+    public partial class FrmBrowser : Form
     {
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InternetSetOption(int hInternet, int dwOption, string lpBuffer, int dwBufferLength);
 
-        [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool InternetSetCookie(string lpszUrlName, string lpszCookieName, string lpszCookieData);
-
         private int secondsWaiting = 30;
 
-        public frmBrowser()
+        public FrmBrowser()
         {
-            // This initializes the components on the form
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
-        private async void frmBrowser_Load(object sender, EventArgs e)
+        private async void FrmBrowser_Load(object sender, EventArgs e)
         {
             // Remove any existing session state data
             InternetSetOption(0, 42, null, 0);
 
             // Localize form
             this.Text = localization.strings.please_login;
-            lblSaving.Text = localization.strings.saving_info;
+            LblSaving.Text = localization.strings.saving_info;
 
             // When the form is loaded, navigate to the Steam login page using the web browser control            
 
-            await webView21.EnsureCoreWebView2Async();
-            webView21.CoreWebView2.Settings.UserAgent = "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko";
+            await WvwBrowser.EnsureCoreWebView2Async();
+            WvwBrowser.CoreWebView2.Settings.UserAgent = "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko";
             // webView21.CoreWebView2.CookieManager.DeleteAllCookies();
-            webView21.CoreWebView2.Navigate("https://steamcommunity.com/login/home/?goto=my/badges");
+            WvwBrowser.CoreWebView2.Navigate("https://steamcommunity.com/login/home/?goto=my/badges");
         }
 
-        private async void webView21_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private async void WvwBrowser_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             // Find the page header, and remove it.  This gives the login form a more streamlined look.
-            dynamic htmldoc = await webView21.ExecuteScriptAsync("document.documentElement.outerHTML;");
+            dynamic htmldoc = await WvwBrowser.ExecuteScriptAsync("document.documentElement.outerHTML;");
 
             htmldoc = Regex.Unescape(htmldoc);
             htmldoc = htmldoc.Remove(0, 1);
@@ -65,7 +60,7 @@ namespace IdleMaster
             }
 
             // Get the URL of the page that just finished loading
-            var url = webView21.Source.ToString();
+            var url = WvwBrowser.Source.ToString();
 
             // If the page it just finished loading is the login page
             //if (url == "https://steamcommunity.com/login/home/?goto=my/profile" ||
@@ -74,8 +69,8 @@ namespace IdleMaster
                 url == "https://store.steampowered.com//login/transfer")
             {
                 // Get a list of cookies from the current page
-                CookieContainer container = GetUriCookieContainer(webView21.Source);
-                var cookies = container.GetCookies(webView21.Source);
+                CookieContainer container = GetUriCookieContainer(WvwBrowser.Source);
+                var cookies = container.GetCookies(WvwBrowser.Source);
                 foreach (Cookie cookie in cookies)
                 {
                     if (cookie.Name.StartsWith("steamMachineAuth"))
@@ -94,7 +89,7 @@ namespace IdleMaster
                         if (parentalNotice.OuterHtml != "")
                         {
                             // Steam family options enabled
-                            webView21.Show();
+                            WvwBrowser.Show();
                             Width = 1000;
                             Height = 350;
                             return;
@@ -107,10 +102,10 @@ namespace IdleMaster
                 }
 
                 // Get a list of cookies from the current page
-                var container = GetUriCookieContainer(webView21.Source);
-                var cookies2 = container.GetCookies(webView21.Source);
+                var container = GetUriCookieContainer(WvwBrowser.Source);
+                var cookies2 = container.GetCookies(WvwBrowser.Source);
 
-                var cookies = await webView21.CoreWebView2.CookieManager.GetCookiesAsync(url);
+                var cookies = await WvwBrowser.CoreWebView2.CookieManager.GetCookiesAsync(url);
 
                 // Go through the cookie data so that we can extract the cookies we are looking for
                 foreach (var cookie in cookies)
@@ -151,7 +146,7 @@ namespace IdleMaster
 
                 // Save all of the data to the program settings file, and close this form
                 Settings.Default.Save();
-                tmrCheck.Enabled = false;
+                TmrCheck.Enabled = false;
                 Close();
             }
         }
@@ -207,7 +202,7 @@ namespace IdleMaster
             return cookies;
         }
 
-        private void webView21_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        private void WvwBrowser_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
         {
             // Get the url that's being navigated to
             var url = e.Uri;
@@ -225,10 +220,10 @@ namespace IdleMaster
                       && url.StartsWith("javascript:") == false && url.StartsWith("about:") == false)
             {
                 // start the sanity check timer
-                tmrCheck.Enabled = true;
+                TmrCheck.Enabled = true;
 
                 // If it's navigating to a page other than the Steam login page, hide the browser control and resize the form
-                webView21.Visible = false;
+                WvwBrowser.Visible = false;
 
                 // Scale the form based on the user's DPI settings
                 var graphics = CreateGraphics();
@@ -239,7 +234,7 @@ namespace IdleMaster
             }
         }
 
-        private void tmrCheck_Tick(object sender, EventArgs e)
+        private void TmrCheck_Tick(object sender, EventArgs e)
         {
             // Prevents the application from "saving" for more than 30 seconds and will attempt to save the cookie data after that time
             if (secondsWaiting > 0)
@@ -248,7 +243,7 @@ namespace IdleMaster
             }
             else
             {
-                tmrCheck.Enabled = false;
+                TmrCheck.Enabled = false;
                 Close();
             }
         }

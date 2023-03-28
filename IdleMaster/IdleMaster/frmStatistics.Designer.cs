@@ -1,6 +1,6 @@
 ﻿namespace IdleMaster
 {
-    partial class frmStatistics
+    partial class FrmStatistics
     {
         /// <summary>
         /// Required designer variable.
@@ -28,102 +28,102 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmStatistics));
-            this.btnOK = new System.Windows.Forms.Button();
-            this.lblSessionTime = new System.Windows.Forms.Label();
-            this.lblSessionCards = new System.Windows.Forms.Label();
-            this.lblTotalCards = new System.Windows.Forms.Label();
-            this.lblTotalTime = new System.Windows.Forms.Label();
-            this.lblSessionHeader = new System.Windows.Forms.Label();
-            this.lblTotalHeader = new System.Windows.Forms.Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmStatistics));
+            this.BtnOk = new System.Windows.Forms.Button();
+            this.LblSessionTime = new System.Windows.Forms.Label();
+            this.LblSessionCards = new System.Windows.Forms.Label();
+            this.LblTotalCards = new System.Windows.Forms.Label();
+            this.LblTotalTime = new System.Windows.Forms.Label();
+            this.LblSessionHeader = new System.Windows.Forms.Label();
+            this.LblTotalHeader = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // btnOK
+            // BtnOk
             // 
-            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOK.Location = new System.Drawing.Point(175, 129);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 0;
-            this.btnOK.Text = "&OK";
-            this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.BtnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOk.Location = new System.Drawing.Point(175, 129);
+            this.BtnOk.Name = "BtnOk";
+            this.BtnOk.Size = new System.Drawing.Size(75, 23);
+            this.BtnOk.TabIndex = 0;
+            this.BtnOk.Text = "&OK";
+            this.BtnOk.UseVisualStyleBackColor = true;
+            this.BtnOk.Click += new System.EventHandler(this.BtnOk_Click);
             // 
-            // lblSessionTime
+            // LblSessionTime
             // 
-            this.lblSessionTime.AutoSize = true;
-            this.lblSessionTime.Location = new System.Drawing.Point(12, 29);
-            this.lblSessionTime.Name = "lblSessionTime";
-            this.lblSessionTime.Size = new System.Drawing.Size(65, 13);
-            this.lblSessionTime.TabIndex = 1;
-            this.lblSessionTime.Text = "sessionTime";
+            this.LblSessionTime.AutoSize = true;
+            this.LblSessionTime.Location = new System.Drawing.Point(12, 29);
+            this.LblSessionTime.Name = "LblSessionTime";
+            this.LblSessionTime.Size = new System.Drawing.Size(65, 13);
+            this.LblSessionTime.TabIndex = 1;
+            this.LblSessionTime.Text = "sessionTime";
             // 
-            // lblSessionCards
+            // LblSessionCards
             // 
-            this.lblSessionCards.AutoSize = true;
-            this.lblSessionCards.Location = new System.Drawing.Point(12, 44);
-            this.lblSessionCards.Name = "lblSessionCards";
-            this.lblSessionCards.Size = new System.Drawing.Size(69, 13);
-            this.lblSessionCards.TabIndex = 2;
-            this.lblSessionCards.Text = "sessionCards";
+            this.LblSessionCards.AutoSize = true;
+            this.LblSessionCards.Location = new System.Drawing.Point(12, 44);
+            this.LblSessionCards.Name = "LblSessionCards";
+            this.LblSessionCards.Size = new System.Drawing.Size(69, 13);
+            this.LblSessionCards.TabIndex = 2;
+            this.LblSessionCards.Text = "sessionCards";
             // 
-            // lblTotalCards
+            // LblTotalCards
             // 
-            this.lblTotalCards.AutoSize = true;
-            this.lblTotalCards.Location = new System.Drawing.Point(12, 104);
-            this.lblTotalCards.Name = "lblTotalCards";
-            this.lblTotalCards.Size = new System.Drawing.Size(54, 13);
-            this.lblTotalCards.TabIndex = 3;
-            this.lblTotalCards.Text = "totalCards";
+            this.LblTotalCards.AutoSize = true;
+            this.LblTotalCards.Location = new System.Drawing.Point(12, 104);
+            this.LblTotalCards.Name = "LblTotalCards";
+            this.LblTotalCards.Size = new System.Drawing.Size(54, 13);
+            this.LblTotalCards.TabIndex = 3;
+            this.LblTotalCards.Text = "totalCards";
             // 
-            // lblTotalTime
+            // LblTotalTime
             // 
-            this.lblTotalTime.AutoSize = true;
-            this.lblTotalTime.Location = new System.Drawing.Point(12, 89);
-            this.lblTotalTime.Name = "lblTotalTime";
-            this.lblTotalTime.Size = new System.Drawing.Size(50, 13);
-            this.lblTotalTime.TabIndex = 4;
-            this.lblTotalTime.Text = "totalTime";
+            this.LblTotalTime.AutoSize = true;
+            this.LblTotalTime.Location = new System.Drawing.Point(12, 89);
+            this.LblTotalTime.Name = "LblTotalTime";
+            this.LblTotalTime.Size = new System.Drawing.Size(50, 13);
+            this.LblTotalTime.TabIndex = 4;
+            this.LblTotalTime.Text = "totalTime";
             // 
-            // lblSessionHeader
+            // LblSessionHeader
             // 
-            this.lblSessionHeader.AutoSize = true;
-            this.lblSessionHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSessionHeader.Location = new System.Drawing.Point(10, 9);
-            this.lblSessionHeader.Name = "lblSessionHeader";
-            this.lblSessionHeader.Size = new System.Drawing.Size(81, 13);
-            this.lblSessionHeader.TabIndex = 5;
-            this.lblSessionHeader.Text = "This session:";
+            this.LblSessionHeader.AutoSize = true;
+            this.LblSessionHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblSessionHeader.Location = new System.Drawing.Point(10, 9);
+            this.LblSessionHeader.Name = "LblSessionHeader";
+            this.LblSessionHeader.Size = new System.Drawing.Size(81, 13);
+            this.LblSessionHeader.TabIndex = 5;
+            this.LblSessionHeader.Text = "This session:";
             // 
-            // lblTotalHeader
+            // LblTotalHeader
             // 
-            this.lblTotalHeader.AutoSize = true;
-            this.lblTotalHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTotalHeader.Location = new System.Drawing.Point(10, 69);
-            this.lblTotalHeader.Name = "lblTotalHeader";
-            this.lblTotalHeader.Size = new System.Drawing.Size(40, 13);
-            this.lblTotalHeader.TabIndex = 6;
-            this.lblTotalHeader.Text = "Total:";
+            this.LblTotalHeader.AutoSize = true;
+            this.LblTotalHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LblTotalHeader.Location = new System.Drawing.Point(10, 69);
+            this.LblTotalHeader.Name = "LblTotalHeader";
+            this.LblTotalHeader.Size = new System.Drawing.Size(40, 13);
+            this.LblTotalHeader.TabIndex = 6;
+            this.LblTotalHeader.Text = "Total:";
             // 
-            // frmStatistics
+            // FrmStatistics
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(253, 157);
-            this.Controls.Add(this.lblTotalHeader);
-            this.Controls.Add(this.lblSessionHeader);
-            this.Controls.Add(this.lblTotalTime);
-            this.Controls.Add(this.lblTotalCards);
-            this.Controls.Add(this.lblSessionCards);
-            this.Controls.Add(this.lblSessionTime);
-            this.Controls.Add(this.btnOK);
+            this.Controls.Add(this.LblTotalHeader);
+            this.Controls.Add(this.LblSessionHeader);
+            this.Controls.Add(this.LblTotalTime);
+            this.Controls.Add(this.LblTotalCards);
+            this.Controls.Add(this.LblSessionCards);
+            this.Controls.Add(this.LblSessionTime);
+            this.Controls.Add(this.BtnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "frmStatistics";
+            this.Name = "FrmStatistics";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Statistics";
-            this.Load += new System.EventHandler(this.frmStatistics_Load);
+            this.Load += new System.EventHandler(this.FrmStatistics_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -131,12 +131,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Label lblSessionTime;
-        private System.Windows.Forms.Label lblSessionCards;
-        private System.Windows.Forms.Label lblTotalCards;
-        private System.Windows.Forms.Label lblTotalTime;
-        private System.Windows.Forms.Label lblSessionHeader;
-        private System.Windows.Forms.Label lblTotalHeader;
+        private System.Windows.Forms.Button BtnOk;
+        private System.Windows.Forms.Label LblSessionTime;
+        private System.Windows.Forms.Label LblSessionCards;
+        private System.Windows.Forms.Label LblTotalCards;
+        private System.Windows.Forms.Label LblTotalTime;
+        private System.Windows.Forms.Label LblSessionHeader;
+        private System.Windows.Forms.Label LblTotalHeader;
     }
 }

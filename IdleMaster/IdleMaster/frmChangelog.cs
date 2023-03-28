@@ -4,19 +4,18 @@ using IdleMaster.Properties;
 
 namespace IdleMaster
 {
-  public partial class frmChangelog : Form
-  {
-    public frmChangelog()
+    public partial class FrmChangelog : Form
     {
-      InitializeComponent();
-    }
+        public FrmChangelog()
+        {
+            InitializeComponent();
+        }
 
-    private void frmChangelog_Load(object sender, EventArgs e)
-    {
-      // Localize Form
-      this.Text = localization.strings.release_notes_title;
+        private void FrmChangelog_Load(object sender, EventArgs e)
+        {
+            this.Text = localization.strings.release_notes_title;
 
-      rtbChangelog.Rtf = Resources.Changelog;
+            TxtChangelog.Rtf = Resources.Changelog;
+        }
     }
-  }
 }

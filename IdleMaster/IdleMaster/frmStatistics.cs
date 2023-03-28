@@ -3,22 +3,23 @@ using System.Windows.Forms;
 
 namespace IdleMaster
 {
-    public partial class frmStatistics : Form
+    public partial class FrmStatistics : Form
     {
-        private Statistics statistics;
-        public frmStatistics(Statistics statistics)
+        private readonly Statistics statistics;
+
+        public FrmStatistics(Statistics statistics)
         {
             InitializeComponent();
             this.statistics = statistics;
         }
 
-        private void frmStatistics_Load(object sender, EventArgs e)
+        private void FrmStatistics_Load(object sender, EventArgs e)
         {
             // Localize Form
             this.Text = localization.strings.statistics.Replace("&", "");
-            btnOK.Text = localization.strings.accept;
-            lblSessionHeader.Text = localization.strings.this_session + ":";
-            lblTotalHeader.Text = localization.strings.total + ":";
+            BtnOk.Text = localization.strings.accept;
+            LblSessionHeader.Text = localization.strings.this_session + ":";
+            LblTotalHeader.Text = localization.strings.total + ":";
             
             TimeSpan sessionMinutesIdled = TimeSpan.FromMinutes(statistics.getSessionMinutesIdled());
             TimeSpan totalMinutesIdled = TimeSpan.FromMinutes(Properties.Settings.Default.totalMinutesIdled);
@@ -29,7 +30,7 @@ namespace IdleMaster
             //Session
             if (sessionHoursIdled > 0)
             {
-                lblSessionTime.Text = String.Format("{0} hour{1}, {2} minute{3} idled",
+                LblSessionTime.Text = String.Format("{0} hour{1}, {2} minute{3} idled",
                         sessionHoursIdled,
                         sessionHoursIdled == 1 ? "" : "s",
                         sessionMinutesIdled.Minutes,
@@ -37,17 +38,17 @@ namespace IdleMaster
             }
             else
             {
-                lblSessionTime.Text = String.Format("{0} minute{1} idled",
+                LblSessionTime.Text = String.Format("{0} minute{1} idled",
                         sessionMinutesIdled.Minutes,
                         sessionMinutesIdled.Minutes == 1 ? "" : "s");
             }
 
-            lblSessionCards.Text = statistics.getSessionCardIdled().ToString() + " cards idled";
+            LblSessionCards.Text = statistics.getSessionCardIdled().ToString() + " cards idled";
 
             //Total
             if (totalHoursIdled > 0)
             {
-                lblTotalTime.Text = String.Format("{0} hour{1}, {2} minute{3} idled",
+                LblTotalTime.Text = String.Format("{0} hour{1}, {2} minute{3} idled",
                     totalHoursIdled,
                     totalHoursIdled == 1 ? "" : "s",
                     totalMinutesIdled.Minutes,
@@ -55,15 +56,15 @@ namespace IdleMaster
             }
             else
             {
-                lblTotalTime.Text = String.Format("{0} minute{1} idled",
+                LblTotalTime.Text = String.Format("{0} minute{1} idled",
                     totalMinutesIdled.Minutes,
                     totalMinutesIdled.Minutes == 1 ? "" : "s");
             }
 
-            lblTotalCards.Text = Properties.Settings.Default.totalCardIdled.ToString() + " cards idled";
+            LblTotalCards.Text = Properties.Settings.Default.totalCardIdled.ToString() + " cards idled";
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object sender, EventArgs e)
         {
             Close();
         }

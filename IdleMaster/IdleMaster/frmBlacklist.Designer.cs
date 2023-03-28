@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace IdleMaster
 {
-    partial class frmBlacklist
+    partial class FrmBlacklist
     {
         /// <summary>
         /// Required designer variable.
@@ -31,54 +31,54 @@ namespace IdleMaster
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmBlacklist));
-            this.lstBlacklist = new System.Windows.Forms.ListBox();
-            this.grpAdd = new System.Windows.Forms.GroupBox();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.txtAppid = new System.Windows.Forms.TextBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmBlacklist));
+            this.LbxBlacklist = new System.Windows.Forms.ListBox();
+            this.GrpAdd = new System.Windows.Forms.GroupBox();
+            this.BtnAdd = new System.Windows.Forms.Button();
+            this.TxtAppid = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.grpAdd.SuspendLayout();
+            this.BtnSave = new System.Windows.Forms.Button();
+            this.BtnRemove = new System.Windows.Forms.Button();
+            this.GrpAdd.SuspendLayout();
             this.SuspendLayout();
             // 
-            // lstBlacklist
+            // LbxBlacklist
             // 
-            this.lstBlacklist.FormattingEnabled = true;
-            this.lstBlacklist.Location = new System.Drawing.Point(13, 13);
-            this.lstBlacklist.Name = "lstBlacklist";
-            this.lstBlacklist.Size = new System.Drawing.Size(270, 316);
-            this.lstBlacklist.Sorted = true;
-            this.lstBlacklist.TabIndex = 0;
+            this.LbxBlacklist.FormattingEnabled = true;
+            this.LbxBlacklist.Location = new System.Drawing.Point(13, 13);
+            this.LbxBlacklist.Name = "LbxBlacklist";
+            this.LbxBlacklist.Size = new System.Drawing.Size(270, 316);
+            this.LbxBlacklist.Sorted = true;
+            this.LbxBlacklist.TabIndex = 0;
             // 
-            // grpAdd
+            // GrpAdd
             // 
-            this.grpAdd.Controls.Add(this.btnAdd);
-            this.grpAdd.Controls.Add(this.txtAppid);
-            this.grpAdd.Controls.Add(this.label1);
-            this.grpAdd.Location = new System.Drawing.Point(13, 336);
-            this.grpAdd.Name = "grpAdd";
-            this.grpAdd.Size = new System.Drawing.Size(181, 76);
-            this.grpAdd.TabIndex = 1;
-            this.grpAdd.TabStop = false;
-            this.grpAdd.Text = "Add Game to Blacklist";
+            this.GrpAdd.Controls.Add(this.BtnAdd);
+            this.GrpAdd.Controls.Add(this.TxtAppid);
+            this.GrpAdd.Controls.Add(this.label1);
+            this.GrpAdd.Location = new System.Drawing.Point(13, 336);
+            this.GrpAdd.Name = "GrpAdd";
+            this.GrpAdd.Size = new System.Drawing.Size(181, 76);
+            this.GrpAdd.TabIndex = 1;
+            this.GrpAdd.TabStop = false;
+            this.GrpAdd.Text = "Add Game to Blacklist";
             // 
-            // btnAdd
+            // BtnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(100, 43);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(75, 23);
-            this.btnAdd.TabIndex = 3;
-            this.btnAdd.Text = "&Add";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.BtnAdd.Location = new System.Drawing.Point(100, 43);
+            this.BtnAdd.Name = "BtnAdd";
+            this.BtnAdd.Size = new System.Drawing.Size(75, 23);
+            this.BtnAdd.TabIndex = 3;
+            this.BtnAdd.Text = "&Add";
+            this.BtnAdd.UseVisualStyleBackColor = true;
+            this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
             // 
-            // txtAppid
+            // TxtAppid
             // 
-            this.txtAppid.Location = new System.Drawing.Point(56, 17);
-            this.txtAppid.Name = "txtAppid";
-            this.txtAppid.Size = new System.Drawing.Size(119, 20);
-            this.txtAppid.TabIndex = 0;
+            this.TxtAppid.Location = new System.Drawing.Point(56, 17);
+            this.TxtAppid.Name = "TxtAppid";
+            this.TxtAppid.Size = new System.Drawing.Size(119, 20);
+            this.TxtAppid.TabIndex = 0;
             // 
             // label1
             // 
@@ -89,59 +89,59 @@ namespace IdleMaster
             this.label1.TabIndex = 0;
             this.label1.Text = "App ID:";
             // 
-            // btnSave
+            // BtnSave
             // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(237, 383);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 3;
-            this.btnSave.Text = "&Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.BtnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnSave.Location = new System.Drawing.Point(237, 383);
+            this.BtnSave.Name = "BtnSave";
+            this.BtnSave.Size = new System.Drawing.Size(75, 23);
+            this.BtnSave.TabIndex = 3;
+            this.BtnSave.Text = "&Save";
+            this.BtnSave.UseVisualStyleBackColor = true;
+            this.BtnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
-            // btnRemove
+            // BtnRemove
             // 
-            this.btnRemove.Image = global::IdleMaster.Properties.Resources.imgTrash;
-            this.btnRemove.Location = new System.Drawing.Point(289, 13);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(28, 28);
-            this.btnRemove.TabIndex = 2;
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            this.BtnRemove.Image = global::IdleMaster.Properties.Resources.imgTrash;
+            this.BtnRemove.Location = new System.Drawing.Point(289, 13);
+            this.BtnRemove.Name = "BtnRemove";
+            this.BtnRemove.Size = new System.Drawing.Size(28, 28);
+            this.BtnRemove.TabIndex = 2;
+            this.BtnRemove.UseVisualStyleBackColor = true;
+            this.BtnRemove.Click += new System.EventHandler(this.BtnRemove_Click);
             // 
-            // frmBlacklist
+            // FrmBlacklist
             // 
-            this.AcceptButton = this.btnAdd;
+            this.AcceptButton = this.BtnAdd;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(324, 418);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.btnRemove);
-            this.Controls.Add(this.grpAdd);
-            this.Controls.Add(this.lstBlacklist);
+            this.Controls.Add(this.BtnSave);
+            this.Controls.Add(this.BtnRemove);
+            this.Controls.Add(this.GrpAdd);
+            this.Controls.Add(this.LbxBlacklist);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmBlacklist";
+            this.Name = "FrmBlacklist";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Manage Idle Master Blacklist";
-            this.Load += new System.EventHandler(this.frmBlacklist_Load);
-            this.grpAdd.ResumeLayout(false);
-            this.grpAdd.PerformLayout();
+            this.Load += new System.EventHandler(this.FrmBlacklist_Load);
+            this.GrpAdd.ResumeLayout(false);
+            this.GrpAdd.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private ListBox lstBlacklist;
-        private GroupBox grpAdd;
-        private Button btnRemove;
-        private Button btnSave;
-        private Button btnAdd;
-        private TextBox txtAppid;
+        private ListBox LbxBlacklist;
+        private GroupBox GrpAdd;
+        private Button BtnRemove;
+        private Button BtnSave;
+        private Button BtnAdd;
+        private TextBox TxtAppid;
         private Label label1;
     }
 }

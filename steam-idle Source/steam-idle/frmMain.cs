@@ -16,8 +16,7 @@ namespace steam_idle
                     {
                         return true; // **** Always accept  
                     };
-        }
-       
+        }       
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -30,7 +29,7 @@ namespace steam_idle
 
             panel1.Hide();
             this.Text = appId.ToString();
-            picApp.Load("https://cdn.akamai.steamstatic.com/steam/apps/" + appId.ToString() + "/header_292x136.jpg");
+            picApp.Load("https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId.ToString() + "/header_292x136.jpg");
         }
     }
 }

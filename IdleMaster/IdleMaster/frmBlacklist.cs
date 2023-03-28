@@ -5,52 +5,54 @@ using IdleMaster.Properties;
 
 namespace IdleMaster
 {
-  public partial class frmBlacklist : Form
-  {
-    public frmBlacklist()
+    public partial class FrmBlacklist : Form
     {
-      InitializeComponent();
-    }
+        public FrmBlacklist()
+        {
+            this.InitializeComponent();
+        }
 
-    public void SaveBlacklist()
-    {
-      Settings.Default.blacklist.Clear();
-      Settings.Default.blacklist.AddRange(lstBlacklist.Items.Cast<string>().ToArray());
-      Settings.Default.Save();
-    }
+        public void SaveBlacklist()
+        {
+            Settings.Default.blacklist.Clear();
+            Settings.Default.blacklist.AddRange(LbxBlacklist.Items.Cast<string>().ToArray());
+            Settings.Default.Save();
+        }
 
-    private void frmBlacklist_Load(object sender, EventArgs e)
-    {
-      // Localize form
-      btnAdd.Text = localization.strings.add;
-      btnSave.Text = localization.strings.save;
-      this.Text = localization.strings.manage_blacklist;
-      grpAdd.Text = localization.strings.add_game_blacklist;
-        
-      lstBlacklist.Items.AddRange(Settings.Default.blacklist.Cast<string>().ToArray());
-    }
+        private void FrmBlacklist_Load(object sender, EventArgs e)
+        {
+            // Localize form
+            BtnAdd.Text = localization.strings.add;
+            BtnSave.Text = localization.strings.save;
+            this.Text = localization.strings.manage_blacklist;
+            GrpAdd.Text = localization.strings.add_game_blacklist;
 
-    private void btnSave_Click(object sender, EventArgs e)
-    {
-      SaveBlacklist();
-      Close();
-    }
+            LbxBlacklist.Items.AddRange(Settings.Default.blacklist.Cast<string>().ToArray());
+        }
 
-    private void btnAdd_Click(object sender, EventArgs e)
-    {
-      int result;
-      if (int.TryParse(txtAppid.Text, out result))
-      {
-        if (lstBlacklist.Items.Cast<string>().All(blApp => blApp != txtAppid.Text))
-          lstBlacklist.Items.Add(txtAppid.Text);
-      }
-      txtAppid.Text = string.Empty;
-      txtAppid.Focus();
-    }
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            this.SaveBlacklist();
+            this.Close();
+        }
 
-    private void btnRemove_Click(object sender, EventArgs e)
-    {
-      lstBlacklist.Items.Remove(lstBlacklist.SelectedItem);
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(TxtAppid.Text, out int result))
+            {
+                if (LbxBlacklist.Items.Cast<string>().All(blApp => blApp != TxtAppid.Text))
+                {
+                    LbxBlacklist.Items.Add(TxtAppid.Text);
+                }
+            }
+
+            TxtAppid.Text = string.Empty;
+            TxtAppid.Focus();
+        }
+
+        private void BtnRemove_Click(object sender, EventArgs e)
+        {
+            LbxBlacklist.Items.Remove(LbxBlacklist.SelectedItem);
+        }
     }
-  }
 }

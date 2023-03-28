@@ -5,33 +5,33 @@ using System.Windows.Forms;
 
 namespace IdleMaster
 {
-  public partial class frmAbout : Form
-  {
-    public frmAbout()
+    public partial class FrmAbout : Form
     {
-      InitializeComponent();
-    }
+        public FrmAbout()
+        {
+            this.InitializeComponent();
+        }
 
-    private void btnOK_Click(object sender, EventArgs e)
-    {
-      Close();
-    }
+        private void BtnOk_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
 
-    private void frmAbout_Load(object sender, EventArgs e)
-    {
-      // Localize the form
-      btnOK.Text = localization.strings.ok;
-        
-      if (ApplicationDeployment.IsNetworkDeployed)
-      {
-        var version = ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
-        lblVersion.Text = "Idle Master v" + version;
-      }
-      else
-      {
-        var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        lblVersion.Text = "Idle Master v" + version;
-      }
+        private void FrmAbout_Load(object sender, EventArgs e)
+        {
+            // Localize the form
+            BtnOk.Text = localization.strings.ok;
+
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                var version = ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+                LblVersion.Text = "Idle Master v" + version;
+            }
+            else
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                LblVersion.Text = "Idle Master v" + version;
+            }
+        }
     }
-  }
 }
